@@ -22,7 +22,7 @@ type Route = RouteProp<AuthStackParamList, "Login">;
 export function LoginScreen() {
   const navigation = useNavigation<Nav>();
   const route = useRoute<Route>();
-  const { login } = useAuth();
+  const { login, loginDemo } = useAuth();
 
   const [email, setEmail] = useState(route.params?.email ?? "");
   const [password, setPassword] = useState("");
@@ -55,8 +55,8 @@ export function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text className="mb-6 text-center text-sm leading-5 text-slate-600">
-          Usa o mesmo email e palavra-passe do cadastro. Se acabaste de te
-          registar, já estão pré-preenchidos.
+          Use o mesmo email e palavra-passe do cadastro. Se acabou de se
+          registar, os campos podem estar pré-preenchidos.
         </Text>
 
         <View className="mb-4">
@@ -95,12 +95,40 @@ export function LoginScreen() {
           <Text className="text-base font-semibold text-white">Entrar</Text>
         </Pressable>
 
+        <View className="mt-8 border-t border-slate-200 pt-8">
+          <Text className="mb-3 text-center text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Simulação rápida (sem preencher)
+          </Text>
+          <Pressable
+            onPress={() => loginDemo("cliente")}
+            className="mb-3 items-center rounded-xl border border-blue-200 bg-blue-50 py-3 active:bg-blue-100"
+          >
+            <Text className="font-semibold text-blue-800">
+              Entrar como cliente (demo)
+            </Text>
+            <Text className="mt-1 text-center text-xs text-blue-600">
+              Perfil de quem procura profissionais
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => loginDemo("profissional")}
+            className="items-center rounded-xl border border-slate-200 bg-white py-3 active:bg-slate-50"
+          >
+            <Text className="font-semibold text-slate-800">
+              Entrar como profissional (demo)
+            </Text>
+            <Text className="mt-1 text-center text-xs text-slate-500">
+              Perfil de quem oferece serviços
+            </Text>
+          </Pressable>
+        </View>
+
         <Pressable
           onPress={() => navigation.navigate("BoasVindas")}
           className="mt-8 items-center py-2"
         >
           <Text className="text-center text-sm text-slate-500">
-            Ainda não tens conta?{" "}
+            Ainda não tem conta?{" "}
             <Text className="font-semibold text-blue-600">Criar conta</Text>
           </Text>
         </Pressable>

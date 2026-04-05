@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   cardOuter: {
     flex: 1,
     minHeight: 0,
-    borderRadius: 24,
+    borderRadius: 8,
     overflow: "hidden",
     backgroundColor: "#0f172a",
   },
