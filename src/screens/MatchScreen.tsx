@@ -2,10 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { RouteProp } from "@react-navigation/native";
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
+  Animated,
   ImageBackground,
+  PanResponder,
   Pressable,
   StyleSheet,
   Text,
@@ -117,7 +119,7 @@ export function MatchScreen() {
           Match Serviços
         </Text>
         <Text className="text-center text-xs text-slate-500">
-          Deslize mentalmente: foto, serviço, preço, avaliação
+          Deslize o card para decidir — veja a dica em baixo
         </Text>
         {temFiltro ? (
           <View className="mt-2 flex-row items-center justify-center gap-2 px-1">
@@ -145,76 +147,202 @@ export function MatchScreen() {
           cardMaxHeight != null ? { maxHeight: cardMaxHeight } : null,
         ]}
       >
-        <ProfileCard professional={current} />
+        <SwipeableProfileCard
+          key={`${current.id}-${index}`}
+          professional={current}
+          screenWidth={windowWidth}
+          onSwipeLeft={skip}
+          onSwipeRight={like}
+        />
       </View>
 
       <View
         style={[screenPadH, styles.actionsRow]}
-        className="shrink-0 flex-row justify-center gap-8 border-t border-slate-200 bg-slate-100 pt-3"
+        className="shrink-0 border-t border-slate-200 bg-slate-100 px-2 pt-3"
       >
-        <Pressable
-          onPress={skip}
-          className="h-16 w-16 items-center justify-center rounded-full border-2 border-slate-300 bg-white active:bg-slate-100"
-          accessibilityLabel="Passar"
-        >
-          <Text className="text-3xl text-slate-500">✕</Text>
-        </Pressable>
-        <Pressable
-          onPress={like}
-          className="h-16 w-16 items-center justify-center rounded-full bg-blue-600 active:bg-blue-700"
-          accessibilityLabel="Tenho interesse neste serviço"
-        >
-          <Ionicons name="checkmark" size={36} color="#ffffff" />
-        </Pressable>
+        <Text style={styles.hintTitle}>Como decidir</Text>
+        <Text style={styles.hintLine}>
+          <Text style={styles.hintEm}>← Esquerda</Text>
+          <Text style={styles.hintBody}> = deslike (passar para o próximo)</Text>
+        </Text>
+        <Text style={styles.hintLine}>
+          <Text style={styles.hintEm}>→ Direita</Text>
+          <Text style={styles.hintBody}> = like (tenho interesse neste perfil)</Text>
+        </Text>
       </View>
     </SafeAreaView>
   );
 }
 
-function ProfileCard({ professional }: { professional: Professional }) {
+const SWIPE_THRESHOLD = 96;
+const VELOCITY_THRESHOLD = 700;
+
+function SwipeableProfileCard({
+  professional,
+  screenWidth,
+  onSwipeLeft,
+  onSwipeRight,
+}: {
+  professional: Professional;
+  screenWidth: number;
+  onSwipeLeft: () => void;
+  onSwipeRight: () => void;
+}) {
+  /** RN `Animated` puro — evita Reanimated/worklets (crash Hermes no iPhone). */
+  const translateX = useRef(new Animated.Value(0)).current;
+
+  const rotateZ = translateX.interpolate({
+    inputRange: [-screenWidth * 0.4, 0, screenWidth * 0.4],
+    outputRange: ["-10deg", "0deg", "10deg"],
+    extrapolate: "clamp",
+  });
+
+  const dislikeOpacity = translateX.interpolate({
+    inputRange: [-140, -36, 0],
+    outputRange: [1, 0.35, 0],
+    extrapolate: "clamp",
+  });
+
+  const dislikeScale = translateX.interpolate({
+    inputRange: [-140, 0],
+    outputRange: [1, 0.65],
+    extrapolate: "clamp",
+  });
+
+  const likeOpacity = translateX.interpolate({
+    inputRange: [0, 36, 140],
+    outputRange: [0, 0.35, 1],
+    extrapolate: "clamp",
+  });
+
+  const likeScale = translateX.interpolate({
+    inputRange: [0, 140],
+    outputRange: [0.65, 1],
+    extrapolate: "clamp",
+  });
+
+  const panResponder = useMemo(
+    () =>
+      PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onMoveShouldSetPanResponder: (_, g) =>
+          Math.abs(g.dx) > Math.abs(g.dy) && Math.abs(g.dx) > 6,
+        onPanResponderMove: (_, g) => {
+          translateX.setValue(g.dx);
+        },
+        onPanResponderRelease: (_, g) => {
+          const tx = g.dx;
+          const v = g.vx;
+          const off = screenWidth * 1.25;
+          if (tx < -SWIPE_THRESHOLD || v < -VELOCITY_THRESHOLD) {
+            Animated.timing(translateX, {
+              toValue: -off,
+              duration: 220,
+              useNativeDriver: true,
+            }).start(({ finished }) => {
+              if (finished) onSwipeLeft();
+            });
+          } else if (tx > SWIPE_THRESHOLD || v > VELOCITY_THRESHOLD) {
+            Animated.timing(translateX, {
+              toValue: off,
+              duration: 220,
+              useNativeDriver: true,
+            }).start(({ finished }) => {
+              if (finished) onSwipeRight();
+            });
+          } else {
+            Animated.spring(translateX, {
+              toValue: 0,
+              friction: 7,
+              tension: 80,
+              useNativeDriver: true,
+            }).start();
+          }
+        },
+      }),
+    [screenWidth, translateX, onSwipeLeft, onSwipeRight],
+  );
+
+  const cardAnimatedStyle = {
+    transform: [{ translateX }, { rotate: rotateZ }],
+  };
+
+  const dislikeOverlayStyle = {
+    opacity: dislikeOpacity,
+    transform: [{ scale: dislikeScale }],
+  };
+
+  const likeOverlayStyle = {
+    opacity: likeOpacity,
+    transform: [{ scale: likeScale }],
+  };
+
   return (
-    <View style={styles.cardOuter}>
-      <View style={styles.cardImageShell}>
-        <ImageBackground
-          source={{ uri: professional.imageUrl }}
-          resizeMode="cover"
-          style={styles.imageBackground}
-        >
-          <LinearGradient
-            colors={[
-              "transparent",
-              "rgba(15, 23, 42, 0.55)",
-              "rgba(15, 23, 42, 0.92)",
-            ]}
-            locations={[0, 0.42, 1]}
-            style={styles.cardOverlay}
+    <View style={styles.swipePanRoot} {...panResponder.panHandlers}>
+      <Animated.View style={[styles.cardOuter, cardAnimatedStyle]}>
+        <View style={styles.cardImageShell}>
+          <ImageBackground
+            source={{ uri: professional.imageUrl }}
+            resizeMode="cover"
+            style={styles.imageBackground}
           >
-            <Text className="text-2xl font-bold text-white">
-              {professional.name}
-            </Text>
-            <Text className="mt-1 text-base text-white/85">
-              {professional.service}
-            </Text>
-            <View className="mt-3 flex-row flex-wrap items-center gap-2">
-              <Text className="rounded-full bg-white/20 px-3 py-1 text-sm font-semibold text-white">
-                {professional.priceLabel}
+            <LinearGradient
+              colors={[
+                "transparent",
+                "rgba(15, 23, 42, 0.55)",
+                "rgba(15, 23, 42, 0.92)",
+              ]}
+              locations={[0, 0.42, 1]}
+              style={styles.cardOverlay}
+            >
+              <Text className="text-2xl font-bold text-white">
+                {professional.name}
               </Text>
-              <Text className="text-sm text-white/80">
-                ★ {professional.rating.toFixed(1)} ({professional.reviewCount}{" "}
-                avaliações)
+              <Text className="mt-1 text-base text-white/85">
+                {professional.service}
               </Text>
+              <View className="mt-3 flex-row flex-wrap items-center gap-2">
+                <Text className="rounded-full bg-white/20 px-3 py-1 text-sm font-semibold text-white">
+                  {professional.priceLabel}
+                </Text>
+                <Text className="text-sm text-white/80">
+                  ★ {professional.rating.toFixed(1)} ({professional.reviewCount}{" "}
+                  avaliações)
+                </Text>
+              </View>
+              <Text className="mt-2 text-sm text-white/75">
+                📍 {professional.city}
+              </Text>
+            </LinearGradient>
+            <View
+              pointerEvents="none"
+              style={styles.swipeOverlayLayer}
+              accessibilityElementsHidden
+              importantForAccessibility="no-hide-descendants"
+            >
+              <Animated.View style={[styles.swipeStamp, dislikeOverlayStyle]}>
+                <View style={styles.stampCircleNope}>
+                  <Ionicons name="close" size={56} color="#fef2f2" />
+                </View>
+              </Animated.View>
+              <Animated.View style={[styles.swipeStamp, likeOverlayStyle]}>
+                <View style={styles.stampCircleLike}>
+                  <Ionicons name="checkmark" size={56} color="#f0fdf4" />
+                </View>
+              </Animated.View>
             </View>
-            <Text className="mt-2 text-sm text-white/75">
-              📍 {professional.city}
-            </Text>
-          </LinearGradient>
-        </ImageBackground>
-      </View>
+          </ImageBackground>
+        </View>
+      </Animated.View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  swipePanRoot: {
+    flex: 1,
+    minHeight: 0,
+  },
   header: {
     paddingBottom: 8,
     paddingTop: 4,
@@ -252,5 +380,58 @@ const styles = StyleSheet.create({
     paddingTop: 64,
     paddingBottom: 14,
     paddingHorizontal: 18,
+  },
+  swipeOverlayLayer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  swipeStamp: {
+    position: "absolute",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  stampCircleNope: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    borderWidth: 4,
+    borderColor: "rgba(239, 68, 68, 0.95)",
+    backgroundColor: "rgba(239, 68, 68, 0.35)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  stampCircleLike: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    borderWidth: 4,
+    borderColor: "rgba(34, 197, 94, 0.95)",
+    backgroundColor: "rgba(34, 197, 94, 0.35)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  hintTitle: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#334155",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  hintLine: {
+    fontSize: 13,
+    color: "#475569",
+    textAlign: "center",
+    lineHeight: 20,
+    marginBottom: 4,
+  },
+  hintEm: {
+    fontWeight: "700",
+    color: "#0f172a",
+  },
+  hintBody: {
+    fontWeight: "400",
+    color: "#475569",
   },
 });
