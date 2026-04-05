@@ -1,16 +1,25 @@
-import { ScrollView, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { MOCK_CURRENT_USER } from "../data/mock";
 
 export function ProfileScreen() {
+  const insets = useSafeAreaInsets();
   const u = MOCK_CURRENT_USER;
+
+  const padH = {
+    paddingLeft: 16 + insets.left,
+    paddingRight: 16 + insets.right,
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
-      <ScrollView className="flex-1" contentContainerClassName="pb-10">
-        <View className="items-center px-4 pt-6">
-          <View className="h-24 w-24 items-center justify-center rounded-full bg-rose-500">
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={[padH, styles.scrollContent]}
+      >
+        <View className="items-center pt-6">
+          <View className="h-24 w-24 items-center justify-center rounded-full bg-blue-600">
             <Text className="text-3xl font-bold text-white">
               {u.name.charAt(0)}
             </Text>
@@ -21,7 +30,7 @@ export function ProfileScreen() {
           </Text>
         </View>
 
-        <View className="mx-4 mt-8 rounded-2xl bg-white p-5 shadow-sm">
+        <View className="mt-8 rounded-2xl bg-white p-5 shadow-sm">
           <Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Interesses / serviços
           </Text>
@@ -37,7 +46,7 @@ export function ProfileScreen() {
           </View>
         </View>
 
-        <View className="mx-4 mt-4 rounded-2xl bg-white p-5 shadow-sm">
+        <View className="mt-4 rounded-2xl bg-white p-5 shadow-sm">
           <Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Reputação (mock)
           </Text>
@@ -46,7 +55,7 @@ export function ProfileScreen() {
           </Text>
         </View>
 
-        <View className="mx-4 mt-6 rounded-xl border border-dashed border-slate-300 bg-white/80 p-4">
+        <View className="mt-6 rounded-xl border border-dashed border-slate-300 bg-white/80 p-4">
           <Text className="text-center text-sm text-slate-500">
             Cadastro completo, filtros e pagamentos entram nas próximas fases — sem
             backend por enquanto.
@@ -56,3 +65,9 @@ export function ProfileScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  scrollContent: {
+    paddingBottom: 40,
+  },
+});

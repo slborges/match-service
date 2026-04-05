@@ -1,19 +1,35 @@
+import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ImageBackground,
   Pressable,
-  ScrollView,
+  StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 import { MOCK_PROFESSIONALS, type Professional } from "../data/mock";
 
 export function MatchScreen() {
+  const insets = useSafeAreaInsets();
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const [index, setIndex] = useState(0);
   const current = MOCK_PROFESSIONALS[index];
+
+  const screenPadH = {
+    paddingLeft: 16 + insets.left,
+    paddingRight: 16 + insets.right,
+  };
+
+  /** Tablets / ecrãs largos: limita altura para o card não ficar desproporcional */
+  const cardMaxHeight =
+    windowWidth >= 600 ? windowHeight * 0.72 : undefined;
 
   const goNext = useCallback(() => {
     setIndex((i) => (i + 1 >= MOCK_PROFESSIONALS.length ? 0 : i + 1));
@@ -37,7 +53,7 @@ export function MatchScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-slate-100" edges={["top"]}>
-      <View className="shrink-0 px-4 pb-2 pt-1">
+      <View style={[screenPadH, styles.header]}>
         <Text className="text-center text-lg font-bold text-slate-900">
           Match Serviços
         </Text>
@@ -46,17 +62,21 @@ export function MatchScreen() {
         </Text>
       </View>
 
-      {/* flex-1 + min-h-0 evita o card “vazar” por cima dos botões (overflow) */}
-      <ScrollView
-        className="min-h-0 flex-1"
-        contentContainerClassName="px-4 pb-3 pt-1"
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
+      {/* Ocupa toda a altura entre título e ações — responsivo ao tamanho do ecrã */}
+      <View
+        style={[
+          screenPadH,
+          styles.cardArea,
+          cardMaxHeight != null ? { maxHeight: cardMaxHeight } : null,
+        ]}
       >
         <ProfileCard professional={current} />
-      </ScrollView>
+      </View>
 
-      <View className="shrink-0 flex-row justify-center gap-8 border-t border-slate-200 bg-slate-100 px-4 pb-4 pt-3">
+      <View
+        style={[screenPadH, styles.actionsRow]}
+        className="shrink-0 flex-row justify-center gap-8 border-t border-slate-200 bg-slate-100 pt-3"
+      >
         <Pressable
           onPress={skip}
           className="h-16 w-16 items-center justify-center rounded-full border-2 border-slate-300 bg-white active:bg-slate-100"
@@ -66,10 +86,10 @@ export function MatchScreen() {
         </Pressable>
         <Pressable
           onPress={like}
-          className="h-16 w-16 items-center justify-center rounded-full bg-rose-500 active:bg-rose-600"
-          accessibilityLabel="Gostei"
+          className="h-16 w-16 items-center justify-center rounded-full bg-blue-600 active:bg-blue-700"
+          accessibilityLabel="Tenho interesse neste serviço"
         >
-          <Text className="text-3xl text-white">♥</Text>
+          <Ionicons name="checkmark" size={36} color="#ffffff" />
         </Pressable>
       </View>
     </SafeAreaView>
@@ -78,12 +98,12 @@ export function MatchScreen() {
 
 function ProfileCard({ professional }: { professional: Professional }) {
   return (
-    <View className="overflow-hidden rounded-3xl bg-slate-900 shadow-sm">
-      <View className="aspect-[4/5] w-full bg-slate-800">
+    <View style={styles.cardOuter}>
+      <View style={styles.cardImageShell}>
         <ImageBackground
           source={{ uri: professional.imageUrl }}
           resizeMode="cover"
-          className="h-full w-full justify-end"
+          style={styles.imageBackground}
         >
           <LinearGradient
             colors={[
@@ -92,7 +112,7 @@ function ProfileCard({ professional }: { professional: Professional }) {
               "rgba(15, 23, 42, 0.92)",
             ]}
             locations={[0, 0.42, 1]}
-            className="w-full px-5 pb-5 pt-16"
+            style={styles.cardOverlay}
           >
             <Text className="text-2xl font-bold text-white">
               {professional.name}
@@ -118,3 +138,44 @@ function ProfileCard({ professional }: { professional: Professional }) {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    paddingBottom: 8,
+    paddingTop: 4,
+  },
+  cardArea: {
+    flex: 1,
+    minHeight: 0,
+    paddingTop: 4,
+    paddingBottom: 8,
+  },
+  cardOuter: {
+    flex: 1,
+    minHeight: 0,
+    borderRadius: 24,
+    overflow: "hidden",
+    backgroundColor: "#0f172a",
+  },
+  cardImageShell: {
+    flex: 1,
+    width: "100%",
+    minHeight: 0,
+  },
+  imageBackground: {
+    flex: 1,
+    width: "100%",
+    minHeight: 0,
+    justifyContent: "flex-end",
+  },
+  actionsRow: {
+    paddingBottom: 16,
+  },
+  /** iOS não aplica bem className em LinearGradient — padding explícito */
+  cardOverlay: {
+    width: "100%",
+    paddingTop: 64,
+    paddingBottom: 14,
+    paddingHorizontal: 18,
+  },
+});

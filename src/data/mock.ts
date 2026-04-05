@@ -39,7 +39,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     rating: 4.8,
     reviewCount: 62,
     city: "São Paulo — Zona Sul",
-    imageUrl: "https://picsum.photos/seed/match1/800/1000",
+    imageUrl: "https://ilumense.com.br/wp-content/uploads/2025/03/ChatGPT-Image-31-de-mar.-de-2025-17_03_43_11zon.jpg",
   },
   {
     id: "2",
@@ -49,7 +49,7 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     rating: 4.9,
     reviewCount: 128,
     city: "São Paulo — Centro",
-    imageUrl: "https://picsum.photos/seed/match2/800/1000",
+    imageUrl: "https://fortsecurite.com.br/wp-content/uploads/2020/08/diarista.jpg",
   },
   {
     id: "3",
@@ -59,17 +59,17 @@ export const MOCK_PROFESSIONALS: Professional[] = [
     rating: 4.6,
     reviewCount: 41,
     city: "São Paulo — Zona Leste",
-    imageUrl: "https://picsum.photos/seed/match3/800/1000",
+    imageUrl: "https://mapa-da-obra-producao.s3.amazonaws.com/wp-content/uploads/2023/02/iStock-587206190-scaled.jpg",
   },
   {
     id: "4",
-    name: "Ana Encanadora",
+    name: "Pedro Encanador",
     service: "Vazamentos, troca de registros",
     priceLabel: "A partir de R$ 90",
     rating: 4.7,
     reviewCount: 55,
     city: "São Paulo — Zona Oeste",
-    imageUrl: "https://picsum.photos/seed/match4/800/1000",
+    imageUrl: "https://www.desentupidorasuprematec.com.br/wp-content/uploads/2016/10/suprematec-desentupidora-servico-encanador-profissional-1.jpg",
   },
 ];
 

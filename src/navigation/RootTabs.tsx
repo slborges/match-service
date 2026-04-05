@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ChatScreen } from "../screens/ChatScreen";
 import { MatchScreen } from "../screens/MatchScreen";
@@ -13,9 +14,12 @@ export type RootTabParamList = {
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
-const accent = "#e11d48";
+const accent = "#2563eb";
 
 export function RootTabs() {
+  const insets = useSafeAreaInsets();
+  const tabBarBottom = Math.max(insets.bottom, 10);
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -25,8 +29,9 @@ export function RootTabs() {
         tabBarStyle: {
           backgroundColor: "#fff",
           borderTopColor: "#f1f5f9",
-          paddingTop: 4,
-          height: 58,
+          paddingTop: 6,
+          paddingBottom: tabBarBottom,
+          minHeight: 48 + tabBarBottom,
         },
         tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
       }}
