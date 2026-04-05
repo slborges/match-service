@@ -1,4 +1,13 @@
-/** Dados mock — substituir por API quando o backend existir */
+/**
+ * Dados mock — substituir por API quando o backend existir.
+ *
+ * **Modelo em camadas (vamos aperfeiçoar por etapas):**
+ * 1. **Perfil do profissional** — pessoa que presta serviço (nome, cidade, foto de perfil, etc.).
+ *    As fotos por utilizador mock vivem em `BLOCOS[].fotosPerfil` (no futuro: upload substitui a URL).
+ * 2. **Perfil do cliente** — quem contrata (conta separada; mock em `AuthContext` / ecrãs de auth).
+ * 3. **Tipo / oferta de serviço** — categoria de trabalho (cards na Busca, filtros). Editável em
+ *    `IMAGENS_CARDS_POR_SERVICO` — não confundir com a foto do profissional.
+ */
 
 export type UserRole = "cliente" | "profissional";
 
@@ -19,6 +28,7 @@ export interface Professional {
   rating: number;
   reviewCount: number;
   city: string;
+  /** Foto de perfil do profissional (mock: `BLOCOS[].fotosPerfil`; depois: upload). */
   imageUrl: string;
 }
 
@@ -43,6 +53,11 @@ type BlocoProfissao = {
   profissao: ProfissaoSlug;
   service: string;
   nomes: [string, string, string, string, string];
+  /**
+   * Foto de **perfil** de cada profissional (mesma ordem que `nomes`).
+   * Troque o URL à mão; no produto virá do upload do utilizador.
+   */
+  fotosPerfil: [string, string, string, string, string];
   priceLabels: [string, string, string, string, string];
   cidades: [string, string, string, string, string];
   ratings: [number, number, number, number, number];
@@ -59,6 +74,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Felipe Nogueira",
       "André Santana",
       "Lucas Ferreira",
+    ],
+    fotosPerfil: [
+      "https://img.freepik.com/fotos-gratis/homem-um-tecnico-eletrico-trabalhando-em-uma-central-eletrica-com-fusiveis_169016-24230.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://img.freepik.com/fotos-gratis/um-eletricista-masculino-trabalha-em-uma-central-eletrica-com-um-cabo-de-conexao-eletrica_169016-52245.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR1-x3uAVjtUJHuH0kVbazxOAHRWZlJQWYGbA&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT987KON8pVd47GwOQhe0nhNxc538dCqhFYMg&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTirgKGcLdgwLiTD5nIpgzPhAw-_aM2tJFKjw&s",
     ],
     priceLabels: [
       "A partir de R$ 120",
@@ -87,6 +109,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Fernanda Lima",
       "Carla Souza",
     ],
+    fotosPerfil: [
+      "https://img.freepik.com/fotos-gratis/dona-de-casa-sorridente-em-pe-de-avental-na-cozinha_259150-59701.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://revistaaldeia.com.br/arquivos/images/Dani%20Diarista-18.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRctDjJWdiaCxyy9vLylu-pNkYIvSnZn8s0vw&s",
+      "https://i.pinimg.com/474x/d5/52/1b/d5521bccf761cab069d44c14df896ed9.jpg",
+      "https://thumbs.dreamstime.com/b/limpeza-vapor-de-cozinha-com-gerador-profissional-mulher-limpa-est%C3%A1-cozinhando-e-desinfetando-fog%C3%A3o-limpadora-mulheres-na-266053241.jpg",
+    ],
     priceLabels: [
       "R$ 45/h",
       "R$ 50/h",
@@ -113,6 +142,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Sérgio Oliveira",
       "Paulo Henrique Dias",
       "Roberto Campos",
+    ],
+    fotosPerfil: [
+      "https://primeirapagina.com.br/wp-content/uploads/2024/12/casa-pedreiro-1200x1595.jpeg",
+      "https://images.pexels.com/photos/30640160/pexels-photo-30640160/free-photo-of-trabalhador-da-construcao-civil-em-frente-a-uma-parede-de-tijolos-sob-a-luz-do-sol.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSnkgE5dLh-CnKaF1e-VIjY5O4vseF1jZEB7w&s",
+      "https://static.ndmais.com.br/2023/11/pedreiro-brincalhao-600x800.png",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwtuh_R5QlY9qm1LSTbZNYuKBWCJS66POVDQ&s",
     ],
     priceLabels: [
       "Orçamento sob consulta",
@@ -141,6 +177,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Bruno Aquino",
       "Diego Pires",
     ],
+    fotosPerfil: [
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWacBfCV46JHB-LVhSQu65UYGc0npgK1GDwQ&s",
+      "https://sosreformasereparos.com.br/wp-content/uploads/2024/06/Encanador-em-Carapicuiba-e-regiao-SOS-Reformas-e-Reparos.png",
+      "https://encanadorfostertec.com.br/wp-content/uploads/2024/03/WhatsApp-Image-2024-03-03-at-11.57.28.jpeg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTVwH2exhw4uCEL3rVzpvYynDdmBQaBU3KHZw&s",
+      "https://bombeirohidraulicobrasilia.com.br/wp-content/uploads/2024/09/Bombeiro-Hidraulico-Brasilia-DF.png",
+    ],
     priceLabels: [
       "A partir de R$ 90",
       "Deslocamento R$ 80 + serviço",
@@ -167,6 +210,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Vinícius Lata",
       "Gabriel Acabamentos",
       "Henrique Moraes",
+    ],
+    fotosPerfil: [
+      "https://www.shutterstock.com/shutterstock/videos/3859678837/thumb/1.jpg?ip=x480",
+      "https://img.freepik.com/fotos-gratis/house-painters-with-paint-roller-in-house_1398-1570.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://thumbs.dreamstime.com/b/homem-pintando-uma-parede-de-cor-branca-vista-traseira-do-pintor-com-rolo-tinta-181730016.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmiNI0RhCzYRqoWaGqEhx0Zs_h5H7lm86fdg&s",
+      "https://s2.glbimg.com/KuGQVnfgJN3bRGU3p3HxxlosygQ=/smart/e.glbimg.com/og/ed/f/original/2020/08/13/interiores-dicas-pintura-youtube-influenciadores_2.jpg",
     ],
     priceLabels: [
       "R$ 35/m²",
@@ -201,7 +251,7 @@ function montarProfissionais(): Professional[] {
         rating: bloco.ratings[i],
         reviewCount: bloco.reviews[i],
         city: bloco.cidades[i],
-        imageUrl: `https://picsum.photos/seed/match-${bloco.profissao}-${n}/800/1000`,
+        imageUrl: bloco.fotosPerfil[i],
       });
     }
   }
@@ -295,13 +345,13 @@ export const IMAGENS_CARDS_POR_SERVICO: readonly {
     slug: "pedreiro",
     tema: "Obra / alvenaria / construção",
     imageUrl:
-      "https://images.pexels.com/photos/3760270/pexels-photo-3760270.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+      "https://eldoradomaterial.com.br/wp-content/uploads/2024/05/tijolo-6-furos-eldorado-material-materiais-de-construcao-sitio-cercado-xapinhal-curitiba-2.png",
   },
   {
     slug: "encanador",
     tema: "Canalização / água / encanamento",
     imageUrl:
-      "https://images.pexels.com/photos/1047542/pexels-photo-1047542.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTid8314m_Cuujue8f3Wo_RvVrBNQb_6RMjcw&s",
   },
   {
     slug: "pintor",
