@@ -1,12 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { useCallback, useMemo, useState } from "react";
 import {
+  FlatList,
+  ImageBackground,
   Pressable,
-  ScrollView,
+  StyleSheet,
   Text,
   TextInput,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -15,13 +19,17 @@ import { useAuth } from "../context/AuthContext";
 import type { RootTabParamList } from "../navigation/types";
 import {
   filterProfessionals,
+  IMAGEM_CARD_PROFISSAO,
   MOCK_PROFESSIONALS,
   TAGS_SERVICOS_POPULARES,
   type ProfissaoSlug,
 } from "../data/mock";
 
+const CARD_GAP = 12;
+
 export function SearchScreen() {
   const insets = useSafeAreaInsets();
+  const { width: windowWidth } = useWindowDimensions();
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const { user } = useAuth();
   const [query, setQuery] = useState("");
@@ -31,6 +39,11 @@ export function SearchScreen() {
     paddingLeft: 16 + insets.left,
     paddingRight: 16 + insets.right,
   };
+
+  /** Largura útil da lista = ecrã menos padding horizontal do ecrã Buscar. */
+  const innerWidth = windowWidth - 32 - insets.left - insets.right;
+  /** ~2,5 cards visíveis por vez (o último “cortado” indica rolagem). */
+  const cardWidth = innerWidth / 2.5;
 
   const isCliente = user?.role === "cliente";
 
@@ -76,7 +89,7 @@ export function SearchScreen() {
         <Text className="text-xl font-bold text-slate-900">Buscar</Text>
         <Text className="mt-0.5 text-sm text-slate-500">
           {isCliente
-            ? "Escolha uma tag ou pesquise e abra o Descobrir para ver os cards."
+            ? "Escolha uma categoria ou pesquise e abra o Descobrir para ver os cards."
             : "Filtre por tipo de serviço ou texto — o Descobrir mostra profissionais nesse critério."}
         </Text>
         <View className="mt-3 flex-row items-center rounded-xl border border-slate-200 bg-slate-50 px-3">
@@ -120,44 +133,106 @@ export function SearchScreen() {
       </View>
 
       <View style={padH} className="flex-1 bg-white pb-4 pt-3">
-        <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Serviços mais procurados — toque para abrir o Descobrir
+        <Text className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
+          Serviços mais procurados
         </Text>
-        <ScrollView
+        <FlatList
+          data={[...TAGS_SERVICOS_POPULARES]}
           horizontal
           showsHorizontalScrollIndicator={false}
-          contentContainerClassName="flex-row gap-2 pb-1"
-        >
-          {TAGS_SERVICOS_POPULARES.map(({ slug, label }) => {
-            const active = tag === slug;
+          keyExtractor={(item) => item.slug}
+          snapToInterval={cardWidth + CARD_GAP}
+          decelerationRate="fast"
+          contentContainerStyle={styles.carouselContent}
+          renderItem={({ item }) => {
+            const active = tag === item.slug;
             return (
               <Pressable
-                key={slug}
-                onPress={() => aoEscolherTag(slug)}
-                className={`rounded-full border px-3 py-2 ${
-                  active
-                    ? "border-blue-600 bg-blue-600"
-                    : "border-slate-200 bg-slate-100"
-                }`}
+                onPress={() => aoEscolherTag(item.slug)}
+                style={[
+                  styles.card,
+                  {
+                    width: cardWidth,
+                    marginRight: CARD_GAP,
+                    borderColor: active ? "#2563eb" : "#e2e8f0",
+                    borderWidth: active ? 2 : 1,
+                  },
+                ]}
               >
-                <Text
-                  className={`text-sm font-medium ${
-                    active ? "text-white" : "text-slate-700"
-                  }`}
+                <ImageBackground
+                  source={{ uri: IMAGEM_CARD_PROFISSAO[item.slug] }}
+                  style={styles.cardImageBg}
+                  resizeMode="cover"
                 >
-                  {label}
-                </Text>
+                  <LinearGradient
+                    colors={[
+                      "transparent",
+                      "rgba(15, 23, 42, 0.5)",
+                      "rgba(15, 23, 42, 0.92)",
+                    ]}
+                    locations={[0, 0.45, 1]}
+                    style={styles.cardGradient}
+                  >
+                    <Text style={styles.cardLabelOverlay} numberOfLines={2}>
+                      {item.label}
+                    </Text>
+                  </LinearGradient>
+                </ImageBackground>
+                {active ? (
+                  <View style={styles.cardBadge}>
+                    <Ionicons name="checkmark-circle" size={22} color="#ffffff" />
+                  </View>
+                ) : null}
               </Pressable>
             );
-          })}
-        </ScrollView>
+          }}
+        />
 
-        <Text className="mt-6 text-center text-sm leading-5 text-slate-500">
-          Ao tocar numa tag, vai direto ao Descobrir com essa profissão. Use a
-          caixa de texto e &quot;Ver no Descobrir&quot; para combinar palavra-chave
-          e, opcionalmente, a última tag selecionada.
+        <Text className="mt-5 text-center text-sm leading-5 text-slate-500">
+          Deslize para o lado para ver todas as categorias. Toque num card para
+          abrir o Descobrir com esse filtro.
         </Text>
       </View>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  carouselContent: {
+    paddingBottom: 8,
+    paddingRight: 4,
+  },
+  card: {
+    borderRadius: 16,
+    overflow: "hidden",
+    backgroundColor: "#0f172a",
+  },
+  cardImageBg: {
+    width: "100%",
+    height: 152,
+  },
+  cardGradient: {
+    flex: 1,
+    justifyContent: "flex-end",
+    paddingHorizontal: 10,
+    paddingBottom: 12,
+    paddingTop: 48,
+  },
+  cardLabelOverlay: {
+    fontSize: 15,
+    fontWeight: "700",
+    color: "#ffffff",
+    textAlign: "center",
+    textShadowColor: "rgba(0,0,0,0.35)",
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  cardBadge: {
+    position: "absolute",
+    top: 8,
+    right: 8,
+    backgroundColor: "rgba(37, 99, 235, 0.92)",
+    borderRadius: 999,
+    padding: 2,
+  },
+});

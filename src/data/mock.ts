@@ -266,6 +266,15 @@ export const TAGS_SERVICOS_POPULARES: readonly {
   { slug: "pintor", label: "Pintor" },
 ] as const;
 
+/** Imagens dos cards de profissão na Busca (seeds estáveis no picsum). */
+export const IMAGEM_CARD_PROFISSAO: Record<ProfissaoSlug, string> = {
+  eletricista: "https://picsum.photos/seed/card-ele/640/800",
+  diarista: "https://picsum.photos/seed/card-dia/640/800",
+  pedreiro: "https://picsum.photos/seed/card-ped/640/800",
+  encanador: "https://picsum.photos/seed/card-enc/640/800",
+  pintor: "https://picsum.photos/seed/card-pin/640/800",
+};
+
 /** Pedidos / oportunidades mock — visão do profissional (busca por tipo de serviço). */
 export interface DemandaServico {
   id: string;
