@@ -73,10 +73,13 @@ export function SearchScreen() {
     (slug: ProfissaoSlug) => {
       const next = tag === slug ? null : slug;
       setTag(next);
-      navigation.navigate("Descobrir", {
-        profissao: next ?? undefined,
-        query: query.trim() || undefined,
-      });
+      /** Só navega ao escolher um filtro novo; desmarcar fica na Busca. */
+      if (next !== null) {
+        navigation.navigate("Descobrir", {
+          profissao: next,
+          query: query.trim() || undefined,
+        });
+      }
     },
     [navigation, query, tag],
   );
