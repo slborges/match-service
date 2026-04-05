@@ -54,30 +54,48 @@ export function AuthStack() {
             route.params.perfil === "cliente"
               ? "Cadastro — Cliente"
               : "Cadastro — Profissional";
+
+          const cadastroHeaderLeft = (
+            <View style={styles.cadastroHeaderRow}>
+              <Pressable
+                onPress={() => navigation.goBack()}
+                hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
+                accessibilityRole="button"
+                accessibilityLabel="Voltar"
+                android_ripple={null}
+                style={({ pressed }) => [
+                  styles.cadastroBackPressable,
+                  { opacity: pressed ? 0.55 : 1 },
+                ]}
+              >
+                <Feather name="arrow-left" size={22} color={accent} />
+              </Pressable>
+              <Text style={styles.cadastroHeaderTitle} numberOfLines={1}>
+                {title}
+              </Text>
+            </View>
+          );
+
           return {
             headerTitle: "",
             headerStyle: { backgroundColor: cadastroScreenBg },
-            /** No iOS: seta estilo Feather (linha + ponta), como na referência — não o chevron do sistema. */
-            headerLeft: () => (
-              <View style={styles.cadastroHeaderRow}>
-                <Pressable
-                  onPress={() => navigation.goBack()}
-                  hitSlop={{ top: 12, bottom: 12, left: 8, right: 8 }}
-                  accessibilityRole="button"
-                  accessibilityLabel="Voltar"
-                  android_ripple={null}
-                  style={({ pressed }) => [
-                    styles.cadastroBackPressable,
-                    { opacity: pressed ? 0.55 : 1 },
-                  ]}
-                >
-                  <Feather name="arrow-left" size={22} color={accent} />
-                </Pressable>
-                <Text style={styles.cadastroHeaderTitle} numberOfLines={1}>
-                  {title}
-                </Text>
-              </View>
-            ),
+            /**
+             * iOS 26+: o sistema aplica fundo branco/arredondado partilhado nos itens da barra.
+             * `unstable_headerLeftItems` + `hidesSharedBackground` desativa esse “pill”.
+             */
+            ...(Platform.OS === "ios"
+              ? {
+                  unstable_headerLeftItems: () => [
+                    {
+                      type: "custom" as const,
+                      element: cadastroHeaderLeft,
+                      hidesSharedBackground: true,
+                    },
+                  ],
+                }
+              : {
+                  headerLeft: () => cadastroHeaderLeft,
+                }),
             headerLeftContainerStyle: {
               backgroundColor: "transparent",
               ...(Platform.OS === "ios"

@@ -45,7 +45,7 @@ export function ProfileScreen() {
           <Text className="mt-1 text-xs text-slate-400">{user.email}</Text>
         </View>
 
-        <View className="mt-8 rounded-2xl bg-white p-5 shadow-sm">
+        <View className="mt-8 rounded-[8px] bg-white p-5 shadow-sm">
           <Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             {user.role === "cliente"
               ? "Interesses / serviços procurados"
@@ -67,7 +67,7 @@ export function ProfileScreen() {
           )}
         </View>
 
-        <View className="mt-4 rounded-2xl bg-white p-5 shadow-sm">
+        <View className="mt-4 rounded-[8px] bg-white p-5 shadow-sm">
           <Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             Reputação (mock)
           </Text>
@@ -78,12 +78,12 @@ export function ProfileScreen() {
 
         <Pressable
           onPress={logout}
-          className="mt-8 items-center rounded-xl border border-slate-200 bg-white py-4 active:bg-slate-50"
+          className="mt-8 items-center rounded-[8px] border border-slate-200 bg-white py-4 active:bg-slate-50"
         >
           <Text className="font-semibold text-slate-700">Sair da conta</Text>
         </Pressable>
 
-        <View className="mt-6 rounded-xl border border-dashed border-slate-300 bg-white/80 p-4">
+        <View className="mt-6 rounded-[8px] border border-dashed border-slate-300 bg-white/80 p-4">
           <Text className="text-center text-sm text-slate-500">
             Sessão mockada — ao sair voltas ao ecrã de boas-vindas.
           </Text>

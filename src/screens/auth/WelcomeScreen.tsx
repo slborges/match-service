@@ -33,7 +33,7 @@ export function WelcomeScreen() {
           onPress={() =>
             navigation.navigate("Cadastro", { perfil: "cliente" })
           }
-          className="relative mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white active:bg-slate-50"
+          className="relative mb-4 overflow-hidden rounded-[8px] border border-slate-200 bg-white active:bg-slate-50"
         >
           <View className="absolute right-3 top-3 z-10">
             <Ionicons name="person" size={20} color="#2563eb" />
@@ -55,7 +55,7 @@ export function WelcomeScreen() {
           onPress={() =>
             navigation.navigate("Cadastro", { perfil: "profissional" })
           }
-          className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white active:bg-slate-50"
+          className="relative overflow-hidden rounded-[8px] border border-slate-200 bg-white active:bg-slate-50"
         >
           <View className="absolute right-3 top-3 z-10">
             <Ionicons name="briefcase" size={20} color="#2563eb" />

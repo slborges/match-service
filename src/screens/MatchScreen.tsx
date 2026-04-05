@@ -101,7 +101,7 @@ export function MatchScreen() {
         {temFiltro ? (
           <Pressable
             onPress={limparFiltro}
-            className="mt-6 rounded-xl bg-blue-600 px-5 py-3 active:bg-blue-700"
+            className="mt-6 rounded-[8px] bg-blue-600 px-5 py-3 active:bg-blue-700"
           >
             <Text className="font-semibold text-white">Limpar filtro</Text>
           </Pressable>
@@ -121,7 +121,7 @@ export function MatchScreen() {
         </Text>
         {temFiltro ? (
           <View className="mt-2 flex-row items-center justify-center gap-2 px-1">
-            <View className="max-w-[90%] rounded-lg bg-blue-50 px-2 py-1.5">
+            <View className="max-w-[90%] rounded-[8px] bg-blue-50 px-2 py-1.5">
               <Text className="text-center text-xs text-blue-800" numberOfLines={2}>
                 Filtro: {resumoFiltro}
               </Text>

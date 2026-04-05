@@ -92,7 +92,7 @@ export function SearchScreen() {
             ? "Escolha uma categoria ou pesquise e abra o Descobrir para ver os cards."
             : "Filtre por tipo de serviço ou texto — o Descobrir mostra profissionais nesse critério."}
         </Text>
-        <View className="mt-3 flex-row items-center rounded-xl border border-slate-200 bg-slate-50 px-3">
+        <View className="mt-3 flex-row items-center rounded-[8px] border border-slate-200 bg-slate-50 px-3">
           <Ionicons name="search" size={20} color="#64748b" />
           <TextInput
             value={query}
@@ -118,7 +118,7 @@ export function SearchScreen() {
 
         <Pressable
           onPress={onSubmitBusca}
-          className="mt-3 flex-row items-center justify-center rounded-xl bg-blue-600 py-3 active:bg-blue-700"
+          className="mt-3 flex-row items-center justify-center rounded-[8px] bg-blue-600 py-3 active:bg-blue-700"
         >
           <Ionicons name="flame" size={20} color="#fff" />
           <Text className="ml-2 text-base font-semibold text-white">
@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
     paddingRight: 4,
   },
   card: {
-    borderRadius: 16,
+    borderRadius: 8,
     overflow: "hidden",
     backgroundColor: "#0f172a",
   },

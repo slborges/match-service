@@ -69,7 +69,7 @@ export function LoginScreen() {
             autoCorrect={false}
             placeholder="nome@email.com"
             placeholderTextColor="#94a3b8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
+            className="rounded-[8px] border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
           />
         </View>
 
@@ -84,13 +84,13 @@ export function LoginScreen() {
             autoCapitalize="none"
             placeholder="••••••••"
             placeholderTextColor="#94a3b8"
-            className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
+            className="rounded-[8px] border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
           />
         </View>
 
         <Pressable
           onPress={onSubmit}
-          className="items-center rounded-xl bg-blue-600 py-4 active:bg-blue-700"
+          className="items-center rounded-[8px] bg-blue-600 py-4 active:bg-blue-700"
         >
           <Text className="text-base font-semibold text-white">Entrar</Text>
         </Pressable>
@@ -101,7 +101,7 @@ export function LoginScreen() {
           </Text>
           <Pressable
             onPress={() => loginDemo("cliente")}
-            className="mb-3 items-center rounded-xl border border-blue-200 bg-blue-50 py-3 active:bg-blue-100"
+            className="mb-3 items-center rounded-[8px] border border-blue-200 bg-blue-50 py-3 active:bg-blue-100"
           >
             <Text className="font-semibold text-blue-800">
               Entrar como cliente (demo)
@@ -112,7 +112,7 @@ export function LoginScreen() {
           </Pressable>
           <Pressable
             onPress={() => loginDemo("profissional")}
-            className="items-center rounded-xl border border-slate-200 bg-white py-3 active:bg-slate-50"
+            className="items-center rounded-[8px] border border-slate-200 bg-white py-3 active:bg-slate-50"
           >
             <Text className="font-semibold text-slate-800">
               Entrar como profissional (demo)

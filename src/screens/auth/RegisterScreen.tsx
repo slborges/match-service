@@ -140,7 +140,7 @@ export function RegisterScreen() {
             multiline
             numberOfLines={4}
             textAlignVertical="top"
-            className="min-h-[100px] rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
+            className="min-h-[100px] rounded-[8px] border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
           />
         </View>
 
@@ -163,7 +163,7 @@ export function RegisterScreen() {
 
         <Pressable
           onPress={onSubmit}
-          className="mt-4 items-center rounded-xl bg-blue-600 py-4 active:bg-blue-700"
+          className="mt-4 items-center rounded-[8px] bg-blue-600 py-4 active:bg-blue-700"
         >
           <Text className="text-base font-semibold text-white">
             Concluir cadastro
@@ -206,7 +206,7 @@ function Field({
         autoCapitalize={autoCapitalize ?? "sentences"}
         autoCorrect={autoCorrect ?? true}
         placeholderTextColor="#94a3b8"
-        className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
+        className="rounded-[8px] border border-slate-200 bg-white px-4 py-3 text-base text-slate-900"
       />
     </View>
   );
