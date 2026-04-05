@@ -275,7 +275,7 @@ export const IMAGEM_CARD_PROFISSAO: Record<ProfissaoSlug, string> = {
   pintor: "https://picsum.photos/seed/card-pin/640/800",
 };
 
-/** Pedidos / oportunidades mock — visão do profissional (busca por tipo de serviço). */
+/** Pedidos / “empregos” mock — visão do profissional no Descobrir (mesmo fluxo swipe do cliente). */
 export interface DemandaServico {
   id: string;
   profissao: ProfissaoSlug;
@@ -284,6 +284,36 @@ export interface DemandaServico {
   orcamentoLabel: string;
   city: string;
   publicadoEm: string;
+  /** Nome fictício do cliente que publicou (demo). */
+  solicitanteLabel?: string;
+}
+
+/** Filtro de ofertas por profissão e texto (igual ideia a `filterProfessionals`). */
+export function filterDemandas(
+  list: DemandaServico[],
+  opts: { profissao?: ProfissaoSlug | null; query?: string | null },
+): DemandaServico[] {
+  let result = [...list];
+  if (opts.profissao) {
+    result = result.filter((d) => d.profissao === opts.profissao);
+  }
+  const q = opts.query?.trim().toLowerCase();
+  if (q) {
+    result = result.filter(
+      (d) =>
+        d.titulo.toLowerCase().includes(q) ||
+        d.resumo.toLowerCase().includes(q) ||
+        d.city.toLowerCase().includes(q) ||
+        LABEL_PROFISSAO[d.profissao].toLowerCase().includes(q) ||
+        (d.solicitanteLabel?.toLowerCase().includes(q) ?? false),
+    );
+  }
+  return result;
+}
+
+/** Imagem de fundo do card de oferta (seed estável por id). */
+export function imagemDemanda(d: DemandaServico): string {
+  return `https://picsum.photos/seed/job-${d.id}/640/800`;
 }
 
 export const MOCK_DEMANDAS: DemandaServico[] = [
@@ -295,6 +325,7 @@ export const MOCK_DEMANDAS: DemandaServico[] = [
     orcamentoLabel: "Até R$ 2.500",
     city: "São Paulo — Vila Mariana",
     publicadoEm: "Hoje",
+    solicitanteLabel: "Cliente — Mariana T.",
   },
   {
     id: "d-ele-2",

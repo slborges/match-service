@@ -3,6 +3,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import type { RouteProp } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Animated,
@@ -20,11 +21,16 @@ import {
 } from "react-native-safe-area-context";
 
 import {
+  filterDemandas,
   filterProfessionals,
+  imagemDemanda,
   LABEL_PROFISSAO,
+  MOCK_DEMANDAS,
   MOCK_PROFESSIONALS,
+  type DemandaServico,
   type Professional,
 } from "../data/mock";
+import { useAuth } from "../context/AuthContext";
 import type { RootTabParamList } from "../navigation/types";
 
 export function MatchScreen() {
@@ -32,24 +38,31 @@ export function MatchScreen() {
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const route = useRoute<RouteProp<RootTabParamList, "Descobrir">>();
   const params = route.params;
+  const { user } = useAuth();
 
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
-  const filtered = useMemo(
-    () =>
-      filterProfessionals(MOCK_PROFESSIONALS, {
+  const isProfissional = user?.role === "profissional";
+
+  const filtered = useMemo((): (Professional | DemandaServico)[] => {
+    if (isProfissional) {
+      return filterDemandas(MOCK_DEMANDAS, {
         profissao: params?.profissao ?? null,
         query: params?.query ?? null,
-      }),
-    [params?.profissao, params?.query],
-  );
+      });
+    }
+    return filterProfessionals(MOCK_PROFESSIONALS, {
+      profissao: params?.profissao ?? null,
+      query: params?.query ?? null,
+    });
+  }, [isProfissional, params?.profissao, params?.query]);
 
   const [index, setIndex] = useState(0);
   const current = filtered[index];
 
   useEffect(() => {
     setIndex(0);
-  }, [params?.profissao, params?.query]);
+  }, [params?.profissao, params?.query, isProfissional]);
 
   const screenPadH = {
     paddingLeft: 16 + insets.left,
@@ -63,7 +76,7 @@ export function MatchScreen() {
   const goNext = useCallback(() => {
     if (filtered.length === 0) return;
     setIndex((i) => (i + 1 >= filtered.length ? 0 : i + 1));
-  }, [filtered.length]);
+  }, [filtered]);
 
   const skip = useCallback(() => {
     goNext();
@@ -95,7 +108,9 @@ export function MatchScreen() {
       <SafeAreaView className="flex-1 items-center justify-center bg-slate-50 px-6">
         <Ionicons name="filter-outline" size={40} color="#94a3b8" />
         <Text className="mt-4 text-center text-base font-semibold text-slate-800">
-          Nenhum profissional com este filtro
+          {isProfissional
+            ? "Nenhuma oferta de trabalho com este filtro"
+            : "Nenhum profissional com este filtro"}
         </Text>
         <Text className="mt-2 text-center text-sm text-slate-500">
           Ajuste a busca na aba Buscar ou limpe o filtro.
@@ -116,10 +131,12 @@ export function MatchScreen() {
     <SafeAreaView className="flex-1 bg-slate-100" edges={["top"]}>
       <View style={[screenPadH, styles.header]}>
         <Text className="text-center text-lg font-bold text-slate-900">
-          Match Serviços
+          {isProfissional ? "Oportunidades" : "Match Serviços"}
         </Text>
         <Text className="text-center text-xs text-slate-500">
-          Deslize o card para decidir — veja a dica em baixo
+          {isProfissional
+            ? "Ofertas de trabalho na tua área — deslize para decidir"
+            : "Deslize o card para decidir — veja a dica em baixo"}
         </Text>
         {temFiltro ? (
           <View className="mt-2 flex-row items-center justify-center gap-2 px-1">
@@ -147,13 +164,23 @@ export function MatchScreen() {
           cardMaxHeight != null ? { maxHeight: cardMaxHeight } : null,
         ]}
       >
-        <SwipeableProfileCard
-          key={`${current.id}-${index}`}
-          professional={current}
-          screenWidth={windowWidth}
-          onSwipeLeft={skip}
-          onSwipeRight={like}
-        />
+        {isProfissional ? (
+          <SwipeableDemandaCard
+            key={`${(current as DemandaServico).id}-${index}`}
+            demanda={current as DemandaServico}
+            screenWidth={windowWidth}
+            onSwipeLeft={skip}
+            onSwipeRight={like}
+          />
+        ) : (
+          <SwipeableProfileCard
+            key={`${(current as Professional).id}-${index}`}
+            professional={current as Professional}
+            screenWidth={windowWidth}
+            onSwipeLeft={skip}
+            onSwipeRight={like}
+          />
+        )}
       </View>
 
       <View
@@ -163,11 +190,19 @@ export function MatchScreen() {
         <Text style={styles.hintTitle}>Como decidir</Text>
         <Text style={styles.hintLine}>
           <Text style={styles.hintEm}>← Esquerda</Text>
-          <Text style={styles.hintBody}> = deslike (passar para o próximo)</Text>
+          <Text style={styles.hintBody}>
+            {isProfissional
+              ? " = passar esta oferta"
+              : " = deslike (passar para o próximo)"}
+          </Text>
         </Text>
         <Text style={styles.hintLine}>
           <Text style={styles.hintEm}>→ Direita</Text>
-          <Text style={styles.hintBody}> = like (tenho interesse neste perfil)</Text>
+          <Text style={styles.hintBody}>
+            {isProfissional
+              ? " = tenho interesse neste trabalho"
+              : " = like (tenho interesse neste perfil)"}
+          </Text>
         </Text>
       </View>
     </SafeAreaView>
@@ -177,18 +212,19 @@ export function MatchScreen() {
 const SWIPE_THRESHOLD = 96;
 const VELOCITY_THRESHOLD = 700;
 
-function SwipeableProfileCard({
-  professional,
+function SwipeableCardShell({
   screenWidth,
   onSwipeLeft,
   onSwipeRight,
+  imageUri,
+  children,
 }: {
-  professional: Professional;
   screenWidth: number;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  imageUri: string;
+  children: ReactNode;
 }) {
-  /** RN `Animated` puro — evita Reanimated/worklets (crash Hermes no iPhone). */
   const translateX = useRef(new Animated.Value(0)).current;
 
   const rotateZ = translateX.interpolate({
@@ -282,38 +318,11 @@ function SwipeableProfileCard({
       <Animated.View style={[styles.cardOuter, cardAnimatedStyle]}>
         <View style={styles.cardImageShell}>
           <ImageBackground
-            source={{ uri: professional.imageUrl }}
+            source={{ uri: imageUri }}
             resizeMode="cover"
             style={styles.imageBackground}
           >
-            <LinearGradient
-              colors={[
-                "transparent",
-                "rgba(15, 23, 42, 0.55)",
-                "rgba(15, 23, 42, 0.92)",
-              ]}
-              locations={[0, 0.42, 1]}
-              style={styles.cardOverlay}
-            >
-              <Text className="text-2xl font-bold text-white">
-                {professional.name}
-              </Text>
-              <Text className="mt-1 text-base text-white/85">
-                {professional.service}
-              </Text>
-              <View className="mt-3 flex-row flex-wrap items-center gap-2">
-                <Text className="rounded-full bg-white/20 px-3 py-1 text-sm font-semibold text-white">
-                  {professional.priceLabel}
-                </Text>
-                <Text className="text-sm text-white/80">
-                  ★ {professional.rating.toFixed(1)} ({professional.reviewCount}{" "}
-                  avaliações)
-                </Text>
-              </View>
-              <Text className="mt-2 text-sm text-white/75">
-                📍 {professional.city}
-              </Text>
-            </LinearGradient>
+            {children}
             <View
               pointerEvents="none"
               style={styles.swipeOverlayLayer}
@@ -335,6 +344,104 @@ function SwipeableProfileCard({
         </View>
       </Animated.View>
     </View>
+  );
+}
+
+function SwipeableProfileCard({
+  professional,
+  screenWidth,
+  onSwipeLeft,
+  onSwipeRight,
+}: {
+  professional: Professional;
+  screenWidth: number;
+  onSwipeLeft: () => void;
+  onSwipeRight: () => void;
+}) {
+  return (
+    <SwipeableCardShell
+      screenWidth={screenWidth}
+      onSwipeLeft={onSwipeLeft}
+      onSwipeRight={onSwipeRight}
+      imageUri={professional.imageUrl}
+    >
+      <LinearGradient
+        colors={[
+          "transparent",
+          "rgba(15, 23, 42, 0.55)",
+          "rgba(15, 23, 42, 0.92)",
+        ]}
+        locations={[0, 0.42, 1]}
+        style={styles.cardOverlay}
+      >
+        <Text className="text-2xl font-bold text-white">{professional.name}</Text>
+        <Text className="mt-1 text-base text-white/85">{professional.service}</Text>
+        <View className="mt-3 flex-row flex-wrap items-center gap-2">
+          <Text className="rounded-full bg-white/20 px-3 py-1 text-sm font-semibold text-white">
+            {professional.priceLabel}
+          </Text>
+          <Text className="text-sm text-white/80">
+            ★ {professional.rating.toFixed(1)} ({professional.reviewCount} avaliações)
+          </Text>
+        </View>
+        <Text className="mt-2 text-sm text-white/75">📍 {professional.city}</Text>
+      </LinearGradient>
+    </SwipeableCardShell>
+  );
+}
+
+function SwipeableDemandaCard({
+  demanda,
+  screenWidth,
+  onSwipeLeft,
+  onSwipeRight,
+}: {
+  demanda: DemandaServico;
+  screenWidth: number;
+  onSwipeLeft: () => void;
+  onSwipeRight: () => void;
+}) {
+  return (
+    <SwipeableCardShell
+      screenWidth={screenWidth}
+      onSwipeLeft={onSwipeLeft}
+      onSwipeRight={onSwipeRight}
+      imageUri={imagemDemanda(demanda)}
+    >
+      <LinearGradient
+        colors={[
+          "transparent",
+          "rgba(15, 23, 42, 0.55)",
+          "rgba(15, 23, 42, 0.92)",
+        ]}
+        locations={[0, 0.42, 1]}
+        style={styles.cardOverlay}
+      >
+        <Text
+          className="text-xs font-semibold uppercase text-amber-300"
+          numberOfLines={1}
+        >
+          {LABEL_PROFISSAO[demanda.profissao]} · {demanda.publicadoEm}
+        </Text>
+        <Text className="mt-2 text-xl font-bold text-white" numberOfLines={3}>
+          {demanda.titulo}
+        </Text>
+        <Text className="mt-2 text-sm leading-5 text-white/85" numberOfLines={4}>
+          {demanda.resumo}
+        </Text>
+        <View className="mt-3 flex-row flex-wrap items-center gap-2">
+          <Text className="rounded-full bg-white/20 px-3 py-1 text-sm font-semibold text-white">
+            {demanda.orcamentoLabel}
+          </Text>
+          {demanda.solicitanteLabel ? (
+            <Text className="text-xs text-white/75" numberOfLines={1}>
+              {demanda.solicitanteLabel}
+            </Text>
+          ) : null}
+        </View>
+        <Text className="mt-2 text-sm text-white/75">📍 {demanda.city}</Text>
+      </LinearGradient>
+    </SwipeableCardShell>
   );
 }
 

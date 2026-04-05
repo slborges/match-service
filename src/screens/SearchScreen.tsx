@@ -18,8 +18,10 @@ import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context"
 import { useAuth } from "../context/AuthContext";
 import type { RootTabParamList } from "../navigation/types";
 import {
+  filterDemandas,
   filterProfessionals,
   IMAGEM_CARD_PROFISSAO,
+  MOCK_DEMANDAS,
   MOCK_PROFESSIONALS,
   TAGS_SERVICOS_POPULARES,
   type ProfissaoSlug,
@@ -47,14 +49,18 @@ export function SearchScreen() {
 
   const isCliente = user?.role === "cliente";
 
-  const resultadoDeck = useMemo(
-    () =>
-      filterProfessionals(MOCK_PROFESSIONALS, {
+  const resultadoDeck = useMemo(() => {
+    if (isCliente) {
+      return filterProfessionals(MOCK_PROFESSIONALS, {
         profissao: tag,
         query: query.trim() || null,
-      }),
-    [query, tag],
-  );
+      });
+    }
+    return filterDemandas(MOCK_DEMANDAS, {
+      profissao: tag,
+      query: query.trim() || null,
+    });
+  }, [isCliente, query, tag]);
 
   const abrirDescobrir = useCallback(() => {
     navigation.navigate("Descobrir", {
@@ -90,7 +96,7 @@ export function SearchScreen() {
         <Text className="mt-0.5 text-sm text-slate-500">
           {isCliente
             ? "Escolha uma categoria ou pesquise e abra o Descobrir para ver os cards."
-            : "Filtre por tipo de serviço ou texto — o Descobrir mostra profissionais nesse critério."}
+            : "Escolha uma área ou pesquise — no Descobrir vê ofertas de trabalho (pedidos de clientes) para deslizar."}
         </Text>
         <View className="mt-3 flex-row items-center rounded-[8px] border border-slate-200 bg-slate-50 px-3">
           <Ionicons name="search" size={20} color="#64748b" />
@@ -122,19 +128,26 @@ export function SearchScreen() {
         >
           <Ionicons name="flame" size={20} color="#fff" />
           <Text className="ml-2 text-base font-semibold text-white">
-            Ver no Descobrir (match)
+            {isCliente ? "Ver no Descobrir (match)" : "Ver ofertas no Descobrir"}
           </Text>
         </Pressable>
 
         <Text className="mt-2 text-center text-xs text-slate-400">
           Com o filtro atual: {resultadoDeck.length}{" "}
-          {resultadoDeck.length === 1 ? "profissional" : "profissionais"} no deck
+          {isCliente
+            ? resultadoDeck.length === 1
+              ? "profissional"
+              : "profissionais"
+            : resultadoDeck.length === 1
+              ? "oferta"
+              : "ofertas"}{" "}
+          no deck
         </Text>
       </View>
 
       <View style={padH} className="flex-1 bg-white pb-4 pt-3">
         <Text className="mb-3 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Serviços mais procurados
+          {isCliente ? "Serviços mais procurados" : "Áreas com mais pedidos"}
         </Text>
         <FlatList
           data={[...TAGS_SERVICOS_POPULARES]}
@@ -192,8 +205,9 @@ export function SearchScreen() {
         />
 
         <Text className="mt-5 text-center text-sm leading-5 text-slate-500">
-          Deslize para o lado para ver todas as categorias. Toque num card para
-          abrir o Descobrir com esse filtro.
+          {isCliente
+            ? "Deslize para o lado para ver todas as categorias. Toque num card para abrir o Descobrir com esse filtro."
+            : "Deslize para ver todas as áreas. Toque num card para abrir o Descobrir com ofertas de trabalho nessa área."}
         </Text>
       </View>
     </SafeAreaView>
