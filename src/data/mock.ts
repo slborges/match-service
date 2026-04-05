@@ -223,6 +223,176 @@ export const MOCK_PROFISSIONAIS_POR_PROFISSAO: Record<
   {} as Record<ProfissaoSlug, Professional[]>,
 );
 
+/** Rótulos para UI (tags, filtros). */
+export const LABEL_PROFISSAO: Record<ProfissaoSlug, string> = {
+  eletricista: "Eletricista",
+  diarista: "Diarista",
+  pedreiro: "Pedreiro",
+  encanador: "Encanador",
+  pintor: "Pintor",
+};
+
+/** Tags dos serviços mais procurados (ordem de exibição). */
+export const TAGS_SERVICOS_POPULARES: readonly {
+  slug: ProfissaoSlug;
+  label: string;
+}[] = [
+  { slug: "eletricista", label: "Eletricista" },
+  { slug: "diarista", label: "Diarista" },
+  { slug: "pedreiro", label: "Pedreiro" },
+  { slug: "encanador", label: "Encanador" },
+  { slug: "pintor", label: "Pintor" },
+] as const;
+
+/** Pedidos / oportunidades mock — visão do profissional (busca por tipo de serviço). */
+export interface DemandaServico {
+  id: string;
+  profissao: ProfissaoSlug;
+  titulo: string;
+  resumo: string;
+  orcamentoLabel: string;
+  city: string;
+  publicadoEm: string;
+}
+
+export const MOCK_DEMANDAS: DemandaServico[] = [
+  {
+    id: "d-ele-1",
+    profissao: "eletricista",
+    titulo: "Trocar quadro monofásico para trifásico",
+    resumo: "Apartamento 80 m², preciso adequação do quadro e novos disjuntores.",
+    orcamentoLabel: "Até R$ 2.500",
+    city: "São Paulo — Vila Mariana",
+    publicadoEm: "Hoje",
+  },
+  {
+    id: "d-ele-2",
+    profissao: "eletricista",
+    titulo: "Instalar tomadas 220 V na cozinha",
+    resumo: "4 pontos novos, eletroduto aparente aceitável.",
+    orcamentoLabel: "R$ 400 – 700",
+    city: "Guarulhos — Centro",
+    publicadoEm: "Ontem",
+  },
+  {
+    id: "d-ele-3",
+    profissao: "eletricista",
+    titulo: "Iluminação LED em escritório",
+    resumo: "Projeto com 12 spots, preciso laudo se necessário.",
+    orcamentoLabel: "Sob consulta",
+    city: "Barueri — Alphaville",
+    publicadoEm: "Há 2 dias",
+  },
+  {
+    id: "d-dia-1",
+    profissao: "diarista",
+    titulo: "Limpeza pós-obra em apartamento",
+    resumo: "Poeira fina, vidros e armários embutidos.",
+    orcamentoLabel: "R$ 350 diária",
+    city: "São Paulo — Mooca",
+    publicadoEm: "Hoje",
+  },
+  {
+    id: "d-dia-2",
+    profissao: "diarista",
+    titulo: "Faxina semanal — 3 cômodos",
+    resumo: "Preferência quartas ou quintas pela manhã.",
+    orcamentoLabel: "R$ 45/h",
+    city: "Santo André — Centro",
+    publicadoEm: "Ontem",
+  },
+  {
+    id: "d-dia-3",
+    profissao: "diarista",
+    titulo: "Organização de closet e limpeza",
+    resumo: "Cliente fornece caixas; foco em dobrar e etiquetar.",
+    orcamentoLabel: "R$ 200 – 280",
+    city: "Osasco",
+    publicadoEm: "Há 3 dias",
+  },
+  {
+    id: "d-ped-1",
+    profissao: "pedreiro",
+    titulo: "Rebocar parede da sala",
+    resumo: "Aprox. 25 m², preparação para pintura.",
+    orcamentoLabel: "Material incluso — orçar",
+    city: "São Paulo — Itaquera",
+    publicadoEm: "Hoje",
+  },
+  {
+    id: "d-ped-2",
+    profissao: "pedreiro",
+    titulo: "Chapisco e contrapiso em área externa",
+    resumo: "12 m², precisa impermeabilização.",
+    orcamentoLabel: "Até R$ 1.800",
+    city: "Taboão da Serra",
+    publicadoEm: "Ontem",
+  },
+  {
+    id: "d-ped-3",
+    profissao: "pedreiro",
+    titulo: "Abrir vão para porta de correr",
+    resumo: "Alvenaria com 15 cm, com acabamento.",
+    orcamentoLabel: "R$ 900 – 1.200",
+    city: "São Bernardo — Centro",
+    publicadoEm: "Há 4 dias",
+  },
+  {
+    id: "d-enc-1",
+    profissao: "encanador",
+    titulo: "Vazamento em registro do chuveiro",
+    resumo: "Apartamento, torneira gotejando há uma semana.",
+    orcamentoLabel: "Até R$ 250",
+    city: "São Paulo — Perdizes",
+    publicadoEm: "Hoje",
+  },
+  {
+    id: "d-enc-2",
+    profissao: "encanador",
+    titulo: "Instalar torneira e sifão novos",
+    resumo: "Compras feitas pelo cliente; só instalação.",
+    orcamentoLabel: "R$ 180",
+    city: "Cotia — Granja Viana",
+    publicadoEm: "Ontem",
+  },
+  {
+    id: "d-enc-3",
+    profissao: "encanador",
+    titulo: "Desentupir ralo da lavanderia",
+    resumo: "Máquina de alta pressão se preciso.",
+    orcamentoLabel: "R$ 120 – 200",
+    city: "São Paulo — Butantã",
+    publicadoEm: "Há 2 dias",
+  },
+  {
+    id: "d-pin-1",
+    profissao: "pintor",
+    titulo: "Pintar 2 quartos + teto",
+    resumo: "Massa corrida ok; cor já escolhida (branco gelo).",
+    orcamentoLabel: "R$ 28–32/m²",
+    city: "São Paulo — Santana",
+    publicadoEm: "Hoje",
+  },
+  {
+    id: "d-pin-2",
+    profissao: "pintor",
+    titulo: "Pintura externa de muro — 40 m linear",
+    resumo: "Textura acrílica, duas demãos.",
+    orcamentoLabel: "Sob consulta",
+    city: "Mauá — Centro",
+    publicadoEm: "Ontem",
+  },
+  {
+    id: "d-pin-3",
+    profissao: "pintor",
+    titulo: "Acabamento fino sala integrada",
+    resumo: "Rodapés e cantos com fita; cliente exige acabamento premium.",
+    orcamentoLabel: "Acima de R$ 4.000",
+    city: "Diadema — Centro",
+    publicadoEm: "Há 5 dias",
+  },
+];
+
 export const MOCK_CHAT_THREADS: ChatThread[] = [
   {
     id: "c1",

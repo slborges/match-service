@@ -2,9 +2,10 @@ import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ChatScreen, MatchScreen, ProfileScreen } from "../screens";
+import { ChatScreen, MatchScreen, ProfileScreen, SearchScreen } from "../screens";
 
 export type RootTabParamList = {
+  Buscar: undefined;
   Descobrir: undefined;
   Conversas: undefined;
   Perfil: undefined;
@@ -34,6 +35,15 @@ export function RootTabs() {
         tabBarLabelStyle: { fontSize: 11, fontWeight: "600" },
       }}
     >
+      <Tab.Screen
+        name="Buscar"
+        component={SearchScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="search" color={color} size={size} />
+          ),
+        }}
+      />
       <Tab.Screen
         name="Descobrir"
         component={MatchScreen}
