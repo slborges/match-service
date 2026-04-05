@@ -266,14 +266,60 @@ export const TAGS_SERVICOS_POPULARES: readonly {
   { slug: "pintor", label: "Pintor" },
 ] as const;
 
-/** Imagens dos cards de profissão na Busca (seeds estáveis no picsum). */
-export const IMAGEM_CARD_PROFISSAO: Record<ProfissaoSlug, string> = {
-  eletricista: "https://picsum.photos/seed/card-ele/640/800",
-  diarista: "https://picsum.photos/seed/card-dia/640/800",
-  pedreiro: "https://picsum.photos/seed/card-ped/640/800",
-  encanador: "https://picsum.photos/seed/card-enc/640/800",
-  pintor: "https://picsum.photos/seed/card-pin/640/800",
-};
+/**
+ * Imagens dos cards “Serviços mais procurados” (Buscar) e fundo dos cards de oferta (profissional).
+ *
+ * **Edite manualmente** `imageUrl` com qualquer link direto de imagem (Pexels, Unsplash, etc.).
+ * O campo `tema` é só lembrete do assunto — não é usado na UI.
+ *
+ * URLs abaixo: stock Pexels alinhado a cada skill (troque se quiser).
+ */
+export const IMAGENS_CARDS_POR_SERVICO: readonly {
+  slug: ProfissaoSlug;
+  tema: string;
+  imageUrl: string;
+}[] = [
+  {
+    slug: "eletricista",
+    tema: "Elétrica / eletricista a trabalhar",
+    imageUrl:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRBKHeHToaTGNNMnf_6ZKgF6knuBYohQvZOAA&s",
+  },
+  {
+    slug: "diarista",
+    tema: "Limpeza / diarista / casa",
+    imageUrl:
+      "https://blog.edona.com.br/wp-content/uploads/2023/08/Limpeza-domestica-com-diarista.jpg",
+  },
+  {
+    slug: "pedreiro",
+    tema: "Obra / alvenaria / construção",
+    imageUrl:
+      "https://images.pexels.com/photos/3760270/pexels-photo-3760270.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+  },
+  {
+    slug: "encanador",
+    tema: "Canalização / água / encanamento",
+    imageUrl:
+      "https://images.pexels.com/photos/1047542/pexels-photo-1047542.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+  },
+  {
+    slug: "pintor",
+    tema: "Pintura / rolo / acabamento",
+    imageUrl:
+      "https://images.pexels.com/photos/221027/pexels-photo-221027.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+  },
+];
+
+/** Mapa derivado — o ecrã usa isto; a lista editável é `IMAGENS_CARDS_POR_SERVICO`. */
+export const IMAGEM_CARD_PROFISSAO: Record<ProfissaoSlug, string> =
+  IMAGENS_CARDS_POR_SERVICO.reduce(
+    (acc, row) => {
+      acc[row.slug] = row.imageUrl;
+      return acc;
+    },
+    {} as Record<ProfissaoSlug, string>,
+  );
 
 /** Pedidos / “empregos” mock — visão do profissional no Descobrir (mesmo fluxo swipe do cliente). */
 export interface DemandaServico {
@@ -311,9 +357,9 @@ export function filterDemandas(
   return result;
 }
 
-/** Imagem de fundo do card de oferta (seed estável por id). */
+/** Imagem de fundo do card de oferta — mesma imagem temática da profissão (editável em `IMAGENS_CARDS_POR_SERVICO`). */
 export function imagemDemanda(d: DemandaServico): string {
-  return `https://picsum.photos/seed/job-${d.id}/640/800`;
+  return IMAGEM_CARD_PROFISSAO[d.profissao];
 }
 
 export const MOCK_DEMANDAS: DemandaServico[] = [
