@@ -1,11 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useMemo, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { useCallback, useMemo, useState } from "react";
 import {
-  FlatList,
-  Image,
   Pressable,
   ScrollView,
-  StyleSheet,
   Text,
   TextInput,
   View,
@@ -13,18 +12,17 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../context/AuthContext";
+import type { RootTabParamList } from "../navigation/types";
 import {
-  LABEL_PROFISSAO,
-  MOCK_DEMANDAS,
+  filterProfessionals,
   MOCK_PROFESSIONALS,
   TAGS_SERVICOS_POPULARES,
-  type DemandaServico,
   type ProfissaoSlug,
-  type Professional,
 } from "../data/mock";
 
 export function SearchScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [tag, setTag] = useState<ProfissaoSlug | null>(null);
@@ -36,45 +34,37 @@ export function SearchScreen() {
 
   const isCliente = user?.role === "cliente";
 
-  const profissionaisFiltrados = useMemo(() => {
-    let list = [...MOCK_PROFESSIONALS];
-    if (tag) {
-      list = list.filter((p) => p.profissao === tag);
-    }
-    const q = query.trim().toLowerCase();
-    if (q) {
-      list = list.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          p.service.toLowerCase().includes(q) ||
-          p.city.toLowerCase().includes(q) ||
-          LABEL_PROFISSAO[p.profissao].toLowerCase().includes(q),
-      );
-    }
-    return list;
-  }, [query, tag]);
+  const resultadoDeck = useMemo(
+    () =>
+      filterProfessionals(MOCK_PROFESSIONALS, {
+        profissao: tag,
+        query: query.trim() || null,
+      }),
+    [query, tag],
+  );
 
-  const demandasFiltradas = useMemo(() => {
-    let list = [...MOCK_DEMANDAS];
-    if (tag) {
-      list = list.filter((d) => d.profissao === tag);
-    }
-    const q = query.trim().toLowerCase();
-    if (q) {
-      list = list.filter(
-        (d) =>
-          d.titulo.toLowerCase().includes(q) ||
-          d.resumo.toLowerCase().includes(q) ||
-          d.city.toLowerCase().includes(q) ||
-          LABEL_PROFISSAO[d.profissao].toLowerCase().includes(q),
-      );
-    }
-    return list;
-  }, [query, tag]);
+  const abrirDescobrir = useCallback(() => {
+    navigation.navigate("Descobrir", {
+      profissao: tag ?? undefined,
+      query: query.trim() || undefined,
+    });
+  }, [navigation, tag, query]);
 
-  const toggleTag = (slug: ProfissaoSlug) => {
-    setTag((prev) => (prev === slug ? null : slug));
-  };
+  const aoEscolherTag = useCallback(
+    (slug: ProfissaoSlug) => {
+      const next = tag === slug ? null : slug;
+      setTag(next);
+      navigation.navigate("Descobrir", {
+        profissao: next ?? undefined,
+        query: query.trim() || undefined,
+      });
+    },
+    [navigation, query, tag],
+  );
+
+  const onSubmitBusca = useCallback(() => {
+    abrirDescobrir();
+  }, [abrirDescobrir]);
 
   if (!user) {
     return null;
@@ -86,18 +76,20 @@ export function SearchScreen() {
         <Text className="text-xl font-bold text-slate-900">Buscar</Text>
         <Text className="mt-0.5 text-sm text-slate-500">
           {isCliente
-            ? "Encontre profissionais por nome, serviço ou área."
-            : "Encontre pedidos por tipo de serviço ou palavra-chave."}
+            ? "Escolha uma tag ou pesquise e abra o Descobrir para ver os cards."
+            : "Filtre por tipo de serviço ou texto — o Descobrir mostra profissionais nesse critério."}
         </Text>
         <View className="mt-3 flex-row items-center rounded-xl border border-slate-200 bg-slate-50 px-3">
           <Ionicons name="search" size={20} color="#64748b" />
           <TextInput
             value={query}
             onChangeText={setQuery}
+            onSubmitEditing={onSubmitBusca}
+            returnKeyType="search"
             placeholder={
               isCliente
                 ? "Ex.: eletricista, Pinheiros, Maria…"
-                : "Ex.: vazamento, pintura, orçamento…"
+                : "Ex.: encanador, pintura, orçamento…"
             }
             placeholderTextColor="#94a3b8"
             className="ml-2 flex-1 py-3 text-base text-slate-900"
@@ -110,11 +102,26 @@ export function SearchScreen() {
             </Pressable>
           ) : null}
         </View>
+
+        <Pressable
+          onPress={onSubmitBusca}
+          className="mt-3 flex-row items-center justify-center rounded-xl bg-blue-600 py-3 active:bg-blue-700"
+        >
+          <Ionicons name="flame" size={20} color="#fff" />
+          <Text className="ml-2 text-base font-semibold text-white">
+            Ver no Descobrir (match)
+          </Text>
+        </Pressable>
+
+        <Text className="mt-2 text-center text-xs text-slate-400">
+          Com o filtro atual: {resultadoDeck.length}{" "}
+          {resultadoDeck.length === 1 ? "profissional" : "profissionais"} no deck
+        </Text>
       </View>
 
-      <View style={padH} className="bg-white pb-2 pt-3">
+      <View style={padH} className="flex-1 bg-white pb-4 pt-3">
         <Text className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">
-          Serviços mais procurados
+          Serviços mais procurados — toque para abrir o Descobrir
         </Text>
         <ScrollView
           horizontal
@@ -126,7 +133,7 @@ export function SearchScreen() {
             return (
               <Pressable
                 key={slug}
-                onPress={() => toggleTag(slug)}
+                onPress={() => aoEscolherTag(slug)}
                 className={`rounded-full border px-3 py-2 ${
                   active
                     ? "border-blue-600 bg-blue-600"
@@ -144,100 +151,13 @@ export function SearchScreen() {
             );
           })}
         </ScrollView>
-      </View>
 
-      {isCliente ? (
-        <FlatList
-          data={profissionaisFiltrados}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={[padH, { paddingBottom: 24, paddingTop: 12 }]}
-          ListEmptyComponent={
-            <Text className="py-8 text-center text-slate-500">
-              Nenhum profissional encontrado. Tente outra palavra ou tag.
-            </Text>
-          }
-          renderItem={({ item }) => (
-            <ClienteResultCard professional={item} />
-          )}
-        />
-      ) : (
-        <FlatList
-          data={demandasFiltradas}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={[padH, { paddingBottom: 24, paddingTop: 12 }]}
-          ListEmptyComponent={
-            <Text className="py-8 text-center text-slate-500">
-              Nenhum pedido encontrado. Ajuste a busca ou a tag.
-            </Text>
-          }
-          renderItem={({ item }) => <DemandaCard demanda={item} />}
-        />
-      )}
+        <Text className="mt-6 text-center text-sm leading-5 text-slate-500">
+          Ao tocar numa tag, vai direto ao Descobrir com essa profissão. Use a
+          caixa de texto e &quot;Ver no Descobrir&quot; para combinar palavra-chave
+          e, opcionalmente, a última tag selecionada.
+        </Text>
+      </View>
     </SafeAreaView>
   );
 }
-
-function ClienteResultCard({ professional }: { professional: Professional }) {
-  return (
-    <View className="mb-3 flex-row overflow-hidden rounded-2xl border border-slate-100 bg-white p-3 shadow-sm">
-      <Image
-        source={{ uri: professional.imageUrl }}
-        style={styles.avatar}
-        resizeMode="cover"
-      />
-      <View className="min-w-0 flex-1 pl-3">
-        <View className="flex-row items-center justify-between gap-2">
-          <Text className="flex-1 font-semibold text-slate-900" numberOfLines={1}>
-            {professional.name}
-          </Text>
-          <Text className="text-xs text-amber-600">
-            ★ {professional.rating.toFixed(1)}
-          </Text>
-        </View>
-        <Text className="mt-0.5 text-xs font-medium text-blue-600">
-          {LABEL_PROFISSAO[professional.profissao]}
-        </Text>
-        <Text className="mt-0.5 text-sm text-slate-600" numberOfLines={2}>
-          {professional.service}
-        </Text>
-        <Text className="mt-1 text-xs text-slate-400" numberOfLines={1}>
-          {professional.city} · {professional.priceLabel}
-        </Text>
-      </View>
-    </View>
-  );
-}
-
-function DemandaCard({ demanda }: { demanda: DemandaServico }) {
-  return (
-    <View className="mb-3 rounded-2xl border border-slate-100 bg-white p-4 shadow-sm">
-      <View className="flex-row items-start justify-between gap-2">
-        <Text className="min-w-0 flex-1 text-base font-semibold text-slate-900">
-          {demanda.titulo}
-        </Text>
-        <View className="rounded-full bg-blue-50 px-2 py-0.5">
-          <Text className="text-xs font-medium text-blue-700">
-            {LABEL_PROFISSAO[demanda.profissao]}
-          </Text>
-        </View>
-      </View>
-      <Text className="mt-2 text-sm leading-5 text-slate-600">{demanda.resumo}</Text>
-      <View className="mt-3 flex-row flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-100 pt-3">
-        <Text className="text-sm font-medium text-slate-800">
-          {demanda.orcamentoLabel}
-        </Text>
-        <Text className="text-xs text-slate-400">{demanda.publicadoEm}</Text>
-      </View>
-      <Text className="mt-1 text-xs text-slate-500">📍 {demanda.city}</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
-    backgroundColor: "#e2e8f0",
-  },
-});

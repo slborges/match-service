@@ -210,6 +210,28 @@ function montarProfissionais(): Professional[] {
 
 export const MOCK_PROFESSIONALS: Professional[] = montarProfissionais();
 
+/** Filtro usado na Busca e no Descobrir (match). */
+export function filterProfessionals(
+  list: Professional[],
+  opts: { profissao?: ProfissaoSlug | null; query?: string | null },
+): Professional[] {
+  let result = [...list];
+  if (opts.profissao) {
+    result = result.filter((p) => p.profissao === opts.profissao);
+  }
+  const q = opts.query?.trim().toLowerCase();
+  if (q) {
+    result = result.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.service.toLowerCase().includes(q) ||
+        p.city.toLowerCase().includes(q) ||
+        LABEL_PROFISSAO[p.profissao].toLowerCase().includes(q),
+    );
+  }
+  return result;
+}
+
 /** Mapa opcional: profissão → lista (5 itens cada) */
 export const MOCK_PROFISSIONAIS_POR_PROFISSAO: Record<
   ProfissaoSlug,

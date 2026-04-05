@@ -3,13 +3,9 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ChatScreen, MatchScreen, ProfileScreen, SearchScreen } from "../screens";
+import type { RootTabParamList } from "./types";
 
-export type RootTabParamList = {
-  Buscar: undefined;
-  Descobrir: undefined;
-  Conversas: undefined;
-  Perfil: undefined;
-};
+export type { RootTabParamList } from "./types";
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
 

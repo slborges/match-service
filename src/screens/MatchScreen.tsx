@@ -1,5 +1,8 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useState } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { RouteProp } from "@react-navigation/native";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   ImageBackground,
@@ -14,13 +17,37 @@ import {
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 
-import { MOCK_PROFESSIONALS, type Professional } from "../data/mock";
+import {
+  filterProfessionals,
+  LABEL_PROFISSAO,
+  MOCK_PROFESSIONALS,
+  type Professional,
+} from "../data/mock";
+import type { RootTabParamList } from "../navigation/types";
 
 export function MatchScreen() {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
+  const route = useRoute<RouteProp<RootTabParamList, "Descobrir">>();
+  const params = route.params;
+
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
+
+  const filtered = useMemo(
+    () =>
+      filterProfessionals(MOCK_PROFESSIONALS, {
+        profissao: params?.profissao ?? null,
+        query: params?.query ?? null,
+      }),
+    [params?.profissao, params?.query],
+  );
+
   const [index, setIndex] = useState(0);
-  const current = MOCK_PROFESSIONALS[index];
+  const current = filtered[index];
+
+  useEffect(() => {
+    setIndex(0);
+  }, [params?.profissao, params?.query]);
 
   const screenPadH = {
     paddingLeft: 16 + insets.left,
@@ -32,8 +59,9 @@ export function MatchScreen() {
     windowWidth >= 600 ? windowHeight * 0.72 : undefined;
 
   const goNext = useCallback(() => {
-    setIndex((i) => (i + 1 >= MOCK_PROFESSIONALS.length ? 0 : i + 1));
-  }, []);
+    if (filtered.length === 0) return;
+    setIndex((i) => (i + 1 >= filtered.length ? 0 : i + 1));
+  }, [filtered.length]);
 
   const skip = useCallback(() => {
     goNext();
@@ -43,10 +71,41 @@ export function MatchScreen() {
     goNext();
   }, [goNext]);
 
+  const temFiltro = Boolean(params?.profissao || params?.query?.trim());
+
+  const limparFiltro = useCallback(() => {
+    navigation.setParams({ profissao: undefined, query: undefined });
+  }, [navigation]);
+
+  const resumoFiltro = useMemo(() => {
+    const partes: string[] = [];
+    if (params?.profissao) {
+      partes.push(LABEL_PROFISSAO[params.profissao]);
+    }
+    if (params?.query?.trim()) {
+      partes.push(`“${params.query.trim()}”`);
+    }
+    return partes.join(" · ");
+  }, [params?.profissao, params?.query]);
+
   if (!current) {
     return (
-      <SafeAreaView className="flex-1 items-center justify-center bg-slate-50">
-        <Text className="text-slate-500">Nenhum profissional no momento.</Text>
+      <SafeAreaView className="flex-1 items-center justify-center bg-slate-50 px-6">
+        <Ionicons name="filter-outline" size={40} color="#94a3b8" />
+        <Text className="mt-4 text-center text-base font-semibold text-slate-800">
+          Nenhum profissional com este filtro
+        </Text>
+        <Text className="mt-2 text-center text-sm text-slate-500">
+          Ajuste a busca na aba Buscar ou limpe o filtro.
+        </Text>
+        {temFiltro ? (
+          <Pressable
+            onPress={limparFiltro}
+            className="mt-6 rounded-xl bg-blue-600 px-5 py-3 active:bg-blue-700"
+          >
+            <Text className="font-semibold text-white">Limpar filtro</Text>
+          </Pressable>
+        ) : null}
       </SafeAreaView>
     );
   }
@@ -60,6 +119,22 @@ export function MatchScreen() {
         <Text className="text-center text-xs text-slate-500">
           Deslize mentalmente: foto, serviço, preço, avaliação
         </Text>
+        {temFiltro ? (
+          <View className="mt-2 flex-row items-center justify-center gap-2 px-1">
+            <View className="max-w-[90%] rounded-lg bg-blue-50 px-2 py-1.5">
+              <Text className="text-center text-xs text-blue-800" numberOfLines={2}>
+                Filtro: {resumoFiltro}
+              </Text>
+            </View>
+            <Pressable
+              onPress={limparFiltro}
+              hitSlop={6}
+              className="rounded-full bg-slate-200 p-1.5 active:bg-slate-300"
+            >
+              <Ionicons name="close" size={16} color="#475569" />
+            </Pressable>
+          </View>
+        ) : null}
       </View>
 
       {/* Ocupa toda a altura entre título e ações — responsivo ao tamanho do ecrã */}
