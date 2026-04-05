@@ -33,23 +33,21 @@ export function WelcomeScreen() {
           onPress={() =>
             navigation.navigate("Cadastro", { perfil: "cliente" })
           }
-          className="mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white active:bg-slate-50"
+          className="relative mb-4 overflow-hidden rounded-2xl border border-slate-200 bg-white active:bg-slate-50"
         >
-          <View className="flex-row items-start p-5">
-            <View className="mr-4 h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
-              <Ionicons name="person" size={32} color="#2563eb" />
-            </View>
-            <View className="min-w-0 flex-1">
-              <Text className="text-lg font-bold text-slate-900">Cliente</Text>
-              <Text className="mt-2 text-sm leading-5 text-slate-600">
-                Procure profissionais para serviços em casa ou no trabalho. Veja
-                perfis, preços e avaliações, faça match e converse quando quiser
-                fechar um serviço.
-              </Text>
-              <Text className="mt-3 text-sm font-semibold text-blue-600">
-                Criar conta como cliente →
-              </Text>
-            </View>
+          <View className="absolute right-3 top-3 z-10">
+            <Ionicons name="person" size={20} color="#2563eb" />
+          </View>
+          <View className="p-5 pr-12">
+            <Text className="text-lg font-bold text-slate-900">Cliente</Text>
+            <Text className="mt-2 text-sm leading-5 text-slate-600">
+              Procure profissionais para serviços em casa ou no trabalho. Veja
+              perfis, preços e avaliações, faça match e converse quando quiser
+              fechar um serviço.
+            </Text>
+            <Text className="mt-3 text-sm font-semibold text-blue-600">
+              Criar conta como cliente →
+            </Text>
           </View>
         </Pressable>
 
@@ -57,25 +55,23 @@ export function WelcomeScreen() {
           onPress={() =>
             navigation.navigate("Cadastro", { perfil: "profissional" })
           }
-          className="overflow-hidden rounded-2xl border border-slate-200 bg-white active:bg-slate-50"
+          className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white active:bg-slate-50"
         >
-          <View className="flex-row items-start p-5">
-            <View className="mr-4 h-14 w-14 items-center justify-center rounded-2xl bg-blue-100">
-              <Ionicons name="briefcase" size={30} color="#2563eb" />
-            </View>
-            <View className="min-w-0 flex-1">
-              <Text className="text-lg font-bold text-slate-900">
-                Profissional
-              </Text>
-              <Text className="mt-2 text-sm leading-5 text-slate-600">
-                Ofereça seus serviços a clientes na sua região. Mostre o que
-                faz, defina disponibilidade e receba pedidos de quem precisa da
-                sua área.
-              </Text>
-              <Text className="mt-3 text-sm font-semibold text-blue-600">
-                Criar conta como profissional →
-              </Text>
-            </View>
+          <View className="absolute right-3 top-3 z-10">
+            <Ionicons name="briefcase" size={20} color="#2563eb" />
+          </View>
+          <View className="p-5 pr-12">
+            <Text className="text-lg font-bold text-slate-900">
+              Profissional
+            </Text>
+            <Text className="mt-2 text-sm leading-5 text-slate-600">
+              Ofereça seus serviços a clientes na sua região. Mostre o que faz,
+              defina disponibilidade e receba pedidos de quem precisa da sua
+              área.
+            </Text>
+            <Text className="mt-3 text-sm font-semibold text-blue-600">
+              Criar conta como profissional →
+            </Text>
           </View>
         </Pressable>
 

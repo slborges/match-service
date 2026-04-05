@@ -48,7 +48,7 @@ export const DEMO_USER_PROFISSIONAL: AuthUser = {
   skillsOrServices: "Instalações elétricas, quadros, iluminação, revisões",
 };
 
-/** Palavra-passe partilhada pelas contas demo (login manual no ecrã Entrar). */
+/** Senha partilhada pelas contas demo (login manual no ecrã Entrar). */
 export const DEMO_LOGIN_PASSWORD = "demo123";
 
 type AuthContextValue = {

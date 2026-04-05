@@ -153,6 +153,7 @@ export function SearchScreen() {
                   styles.card,
                   {
                     width: cardWidth,
+                    height: cardWidth,
                     marginRight: CARD_GAP,
                     borderColor: active ? "#2563eb" : "#e2e8f0",
                     borderWidth: active ? 2 : 1,
@@ -207,19 +208,20 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     backgroundColor: "#0f172a",
   },
+  /** Preenche o quadrado do card; flex:1 estica até à altura do Pressable. */
   cardImageBg: {
+    flex: 1,
     width: "100%",
-    height: 152,
   },
   cardGradient: {
     flex: 1,
     justifyContent: "flex-end",
-    paddingHorizontal: 10,
-    paddingBottom: 12,
-    paddingTop: 48,
+    paddingHorizontal: 8,
+    paddingBottom: 10,
+    paddingTop: 24,
   },
   cardLabelOverlay: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "700",
     color: "#ffffff",
     textAlign: "center",

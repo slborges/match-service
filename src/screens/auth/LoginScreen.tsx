@@ -38,7 +38,7 @@ export function LoginScreen() {
     if (!ok) {
       Alert.alert(
         "Não foi possível entrar",
-        "Verifique o email e a palavra-passe. Se acabou de se registar, use a mesma palavra-passe do cadastro.",
+        "Verifique o email e a senha. Se acabou de se registar, use a mesma senha do cadastro.",
       );
     }
   }, [email, password, login]);
@@ -55,7 +55,7 @@ export function LoginScreen() {
         showsVerticalScrollIndicator={false}
       >
         <Text className="mb-6 text-center text-sm leading-5 text-slate-600">
-          Use o mesmo email e palavra-passe do cadastro. Se acabou de se
+          Use o mesmo email e senha do cadastro. Se acabou de se
           registar, os campos podem estar pré-preenchidos.
         </Text>
 
@@ -75,7 +75,7 @@ export function LoginScreen() {
 
         <View className="mb-6">
           <Text className="mb-2 text-sm font-medium text-slate-700">
-            Palavra-passe
+            Senha
           </Text>
           <TextInput
             value={password}

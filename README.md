@@ -77,17 +77,17 @@ npx expo install nome-do-pacote
 
 Não há backend: a sessão fica só em memória. Podes entrar de três formas:
 
-1. **Botões “Simulação rápida”** no ecrã **Entrar** — um toque entra como cliente ou profissional (sem email nem palavra-passe).
+1. **Botões “Simulação rápida”** no ecrã **Entrar** — um toque entra como cliente ou profissional (sem email nem senha).
 2. **Login manual** com estes dados (definidos em `src/context/AuthContext.tsx`):
 
-| Perfil | Email | Palavra-passe |
+| Perfil | Email | Senha |
 |--------|--------|----------------|
 | Cliente | `cliente@match.com` | `demo123` |
 | Profissional | `profissional@match.com` | `demo123` |
 
-3. **Fluxo normal**: registo → **Entrar** com o email e a palavra-passe que definiste no cadastro.
+3. **Fluxo normal**: registo → **Entrar** com o email e a senha que definiste no cadastro.
 
-Qualquer outro email com palavra-passe continua a aceitar um utilizador genérico **cliente** (comportamento de demo do contexto).
+Qualquer outro email com senha continua a aceitar um utilizador genérico **cliente** (comportamento de demo do contexto).
 
 ---
 

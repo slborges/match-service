@@ -39,11 +39,11 @@ export function RegisterScreen() {
       return;
     }
     if (password.length < 4) {
-      Alert.alert("Palavra-passe", "Usa pelo menos 4 caracteres (demo).");
+      Alert.alert("Senha", "Usa pelo menos 4 caracteres (demo).");
       return;
     }
     if (password !== confirm) {
-      Alert.alert("Confirmação", "As palavras-passe não coincidem.");
+      Alert.alert("Confirmação", "As senhas não coincidem.");
       return;
     }
     if (perfil === "cliente" && !extras.trim()) {
@@ -107,7 +107,7 @@ export function RegisterScreen() {
       >
         <Text className="mb-6 text-sm leading-5 text-slate-600">
           {perfil === "cliente"
-            ? "Cria a tua conta de cliente. Depois vais poder entrar com email e palavra-passe."
+            ? "Cria a tua conta de cliente. Depois vais poder entrar com email e senha."
             : "Cria a tua conta de profissional. Os clientes vão ver o que ofereces após o match."}
         </Text>
 
@@ -145,7 +145,7 @@ export function RegisterScreen() {
         </View>
 
         <Field
-          label="Palavra-passe *"
+          label="Senha *"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -153,7 +153,7 @@ export function RegisterScreen() {
           autoCorrect={false}
         />
         <Field
-          label="Confirmar palavra-passe *"
+          label="Confirmar senha *"
           value={confirm}
           onChangeText={setConfirm}
           secureTextEntry
