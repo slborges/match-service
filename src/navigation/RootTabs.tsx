@@ -2,9 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ChatScreen } from "../screens/ChatScreen";
-import { MatchScreen } from "../screens/MatchScreen";
-import { ProfileScreen } from "../screens/ProfileScreen";
+import { ChatScreen, MatchScreen, ProfileScreen } from "../screens";
 
 export type RootTabParamList = {
   Descobrir: undefined;
