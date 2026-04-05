@@ -143,6 +143,8 @@ export function SearchScreen() {
           keyExtractor={(item) => item.slug}
           snapToInterval={cardWidth + CARD_GAP}
           decelerationRate="fast"
+          /** Altura da viewport = altura do card (quadrado), sem faixa vazia por baixo. */
+          style={{ height: cardWidth }}
           contentContainerStyle={styles.carouselContent}
           renderItem={({ item }) => {
             const active = tag === item.slug;
@@ -200,8 +202,8 @@ export function SearchScreen() {
 
 const styles = StyleSheet.create({
   carouselContent: {
-    paddingBottom: 8,
     paddingRight: 4,
+    alignItems: "stretch",
   },
   card: {
     borderRadius: 8,
