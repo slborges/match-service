@@ -130,7 +130,7 @@ export function MatchScreen() {
     <SafeAreaView className="flex-1 bg-slate-100" edges={["top"]}>
       <View style={[screenPadH, styles.header]}>
         <Text className="text-center text-lg font-bold text-slate-900">
-          {isProfissional ? "Oportunidades" : "Match Serviços"}
+          {isProfissional ? "Oportunidades" : "ServLink"}
         </Text>
         <Text className="text-center text-xs text-slate-500">
           {isProfissional

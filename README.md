@@ -1,4 +1,4 @@
-# Match Serviços (Expo + React Native)
+# ServLink (Expo + React Native)
 
 ## Pré-requisitos
 

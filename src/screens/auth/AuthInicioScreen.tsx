@@ -21,7 +21,7 @@ export function AuthInicioScreen() {
             accessibilityIgnoresInvertColors
           />
           <Text className="mt-6 text-center text-3xl font-bold text-slate-900">
-            Match Serviços
+            ServLink
           </Text>
           <Text className="mt-3 max-w-[320px] text-center text-base leading-6 text-slate-500">
             Liga quem precisa de ajuda a quem sabe fazer o serviço.
