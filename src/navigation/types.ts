@@ -12,3 +12,10 @@ export type RootTabParamList = {
   Conversas: undefined;
   Perfil: undefined;
 };
+
+/** Pilha dentro do separador Perfil — perfil, publicação e lista de pedidos (cliente). */
+export type ProfileStackParamList = {
+  PerfilInicio: undefined;
+  PedidoNovo: undefined;
+  PedidosLista: undefined;
+};

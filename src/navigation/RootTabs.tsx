@@ -2,7 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ChatScreen, MatchScreen, ProfileScreen, SearchScreen } from "../screens";
+import { ChatScreen, MatchScreen, SearchScreen } from "../screens";
+import { ProfileStack } from "./ProfileStack";
 import type { RootTabParamList } from "./types";
 
 export type { RootTabParamList } from "./types";
@@ -60,7 +61,7 @@ export function RootTabs() {
       />
       <Tab.Screen
         name="Perfil"
-        component={ProfileScreen}
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" color={color} size={size} />

@@ -696,6 +696,54 @@ export const MOCK_DEMANDAS_POR_PROFISSAO: Record<
   {} as Record<ProfissaoSlug, DemandaServico[]>,
 );
 
+/**
+ * Pedidos de exemplo para «Os meus pedidos» (cliente).
+ * Mesma forma que `DemandaCliente` em `AuthContext` — editável à mão até existir API.
+ */
+export type PedidoClienteListaMock = {
+  id: string;
+  titulo: string;
+  resumo: string;
+  profissao: ProfissaoSlug;
+  orcamentoLabel: string;
+  city: string;
+  status: "pendente" | "atendida";
+  criadaEm: number;
+};
+
+export const MOCK_PEDIDOS_CLIENTE: PedidoClienteListaMock[] = [
+  {
+    id: "mock-pc-1",
+    titulo: "Rever tomadas na cozinha",
+    resumo: "Quero 3 pontos novos com eletroduto embutido se possível.",
+    profissao: "eletricista",
+    orcamentoLabel: "Até R$ 600",
+    city: "São Paulo — Vila Mariana",
+    status: "pendente",
+    criadaEm: 1_732_540_800_000,
+  },
+  {
+    id: "mock-pc-2",
+    titulo: "Faxina pós-mudança",
+    resumo: "Apartamento 65 m², caixas ainda no chão.",
+    profissao: "diarista",
+    orcamentoLabel: "R$ 280 diária",
+    city: "Santo André — Centro",
+    status: "atendida",
+    criadaEm: 1_731_763_200_000,
+  },
+  {
+    id: "mock-pc-3",
+    titulo: "Pintar hall e corredor",
+    resumo: "Teto branco, paredes cinza claro — tinta já comprada.",
+    profissao: "pintor",
+    orcamentoLabel: "Sob consulta",
+    city: "São Paulo — Santana",
+    status: "pendente",
+    criadaEm: 1_733_232_000_000,
+  },
+];
+
 export const MOCK_CHAT_THREADS: ChatThread[] = [
   {
     id: "c1",
