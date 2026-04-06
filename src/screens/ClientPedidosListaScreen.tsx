@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useMemo } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScreenHeaderBar } from "../components/ScreenHeaderBar";
@@ -30,7 +30,13 @@ export function ClientPedidosListaScreen() {
   const insets = useSafeAreaInsets();
   const navigation =
     useNavigation<NativeStackNavigationProp<ProfileStackParamList>>();
-  const { user, demandasCliente, setDemandaClienteStatus } = useAuth();
+  const {
+    user,
+    demandasCliente,
+    demandasProfissionalAceitas,
+    setDemandaClienteStatus,
+    confirmarExecucaoDemandaCliente,
+  } = useAuth();
 
   const padH = {
     paddingLeft: 16 + insets.left,
@@ -53,6 +59,39 @@ export function ClientPedidosListaScreen() {
       setDemandaClienteStatus(d.id, next);
     },
     [setDemandaClienteStatus],
+  );
+
+  const porDemandaClienteAguardando = useMemo(
+    () =>
+      new Map(
+        demandasProfissionalAceitas
+          .filter(
+            (d) =>
+              d.demandaClienteId &&
+              d.statusExecucao === "aguardando_confirmacao_cliente",
+          )
+          .map((d) => [d.demandaClienteId as string, d]),
+      ),
+    [demandasProfissionalAceitas],
+  );
+
+  const confirmarExecucao = useCallback(
+    (demandaClienteId: string) => {
+      Alert.alert(
+        "Confirmar execução",
+        "Confirma que a demanda foi executada? Esta ação conclui o pedido no seu perfil e no perfil do profissional.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Confirmar",
+            onPress: () => {
+              confirmarExecucaoDemandaCliente(demandaClienteId);
+            },
+          },
+        ],
+      );
+    },
+    [confirmarExecucaoDemandaCliente],
   );
 
   if (!user || user.role !== "cliente") {
@@ -117,6 +156,10 @@ export function ClientPedidosListaScreen() {
                 key={d.id}
                 className="rounded-[8px] border border-slate-200 bg-white p-4"
               >
+                {(() => {
+                  const demandaAguardando = porDemandaClienteAguardando.get(d.id);
+                  return (
+                    <>
                 <View className="flex-row flex-wrap items-start justify-between gap-2">
                   <Text className="flex-1 text-base font-semibold text-slate-900">
                     {d.titulo}
@@ -149,7 +192,21 @@ export function ClientPedidosListaScreen() {
                   </Text>
                 ) : null}
                 <Text className="mt-1 text-sm text-slate-600">📍 {d.city}</Text>
-                {listaSoExemplosMock ? (
+                {demandaAguardando ? (
+                  <>
+                    <Text className="mt-3 text-xs text-blue-700">
+                      O profissional marcou esta demanda como executada e aguarda sua confirmação.
+                    </Text>
+                    <Pressable
+                      onPress={() => confirmarExecucao(d.id)}
+                      className="mt-2 self-start rounded-[8px] border border-blue-200 bg-blue-50 px-3 py-2 active:bg-blue-100"
+                    >
+                      <Text className="text-sm font-medium text-blue-800">
+                        Confirmar execução
+                      </Text>
+                    </Pressable>
+                  </>
+                ) : listaSoExemplosMock ? (
                   <Text className="mt-3 text-xs text-slate-400">
                     Pedido de exemplo (mock)
                   </Text>
@@ -165,6 +222,9 @@ export function ClientPedidosListaScreen() {
                     </Text>
                   </Pressable>
                 )}
+                    </>
+                  );
+                })()}
               </View>
             ))}
           </View>

@@ -750,6 +750,7 @@ export const MOCK_PEDIDOS_CLIENTE: PedidoClienteListaMock[] = [
  */
 export type DemandaAceitaProfissionalMock = {
   id: string;
+  demandaClienteId?: string;
   titulo: string;
   resumo: string;
   profissao: ProfissaoSlug;
@@ -766,6 +767,7 @@ export type DemandaAceitaProfissionalMock = {
 export const MOCK_DEMANDAS_ACEITAS_PROFISSIONAL: DemandaAceitaProfissionalMock[] = [
   {
     id: "mock-dap-1",
+    demandaClienteId: "mock-pc-1",
     titulo: "Troca de 5 tomadas no quarto",
     resumo: "Cliente pediu instalação com revisão de fiação no mesmo ponto.",
     profissao: "eletricista",
@@ -777,6 +779,7 @@ export const MOCK_DEMANDAS_ACEITAS_PROFISSIONAL: DemandaAceitaProfissionalMock[]
   },
   {
     id: "mock-dap-2",
+    demandaClienteId: "mock-pc-3",
     titulo: "Pintura de parede da sala",
     resumo: "Acordado no chat: tinta fosca, uma parede destaque azul petróleo.",
     profissao: "pintor",
@@ -788,6 +791,7 @@ export const MOCK_DEMANDAS_ACEITAS_PROFISSIONAL: DemandaAceitaProfissionalMock[]
   },
   {
     id: "mock-dap-3",
+    demandaClienteId: "mock-pc-2",
     titulo: "Revisão de torneira com vazamento",
     resumo: "Cliente relatou pinga contínua. Serviço ficou para sábado de manhã.",
     profissao: "encanador",

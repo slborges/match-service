@@ -9,6 +9,7 @@ import {
 
 import {
   MOCK_DEMANDAS_ACEITAS_PROFISSIONAL,
+  MOCK_PEDIDOS_CLIENTE,
   type ProfissaoSlug,
 } from "../data/mock";
 
@@ -43,6 +44,7 @@ export type DemandaProfissionalAceitaStatus =
 
 export type DemandaProfissionalAceita = {
   id: string;
+  demandaClienteId?: string;
   titulo: string;
   resumo: string;
   profissao: ProfissaoSlug;
@@ -112,6 +114,7 @@ type AuthContextValue = {
     id: string,
     status: DemandaProfissionalAceitaStatus,
   ) => void;
+  confirmarExecucaoDemandaCliente: (demandaClienteId: string) => boolean;
   register: (data: RegistrationDraft) => void;
   login: (email: string, password: string) => boolean;
   /** Entrada instantânea com perfil de demonstração (cliente ou profissional). */
@@ -167,6 +170,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
     },
     [],
+  );
+
+  const confirmarExecucaoDemandaCliente = useCallback(
+    (demandaClienteId: string) => {
+      const alvo = demandasProfissionalAceitas.find(
+        (d) =>
+          d.demandaClienteId === demandaClienteId &&
+          d.statusExecucao === "aguardando_confirmacao_cliente",
+      );
+      if (!alvo) return false;
+
+      setDemandasCliente((prev) => {
+        const base = prev.length > 0 ? prev : MOCK_PEDIDOS_CLIENTE;
+        return base.map((d) =>
+          d.id === demandaClienteId ? { ...d, status: "atendida" } : d,
+        );
+      });
+
+      setDemandasProfissionalAceitas((prev) =>
+        prev.map((d) =>
+          d.id === alvo.id ? { ...d, statusExecucao: "executada" } : d,
+        ),
+      );
+
+      return true;
+    },
+    [demandasProfissionalAceitas],
   );
 
   const register = useCallback((data: RegistrationDraft) => {
@@ -236,6 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       addDemandaCliente,
       setDemandaClienteStatus,
       setDemandaProfissionalAceitaStatus,
+      confirmarExecucaoDemandaCliente,
       register,
       login,
       loginDemo,
@@ -249,6 +280,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       addDemandaCliente,
       setDemandaClienteStatus,
       setDemandaProfissionalAceitaStatus,
+      confirmarExecucaoDemandaCliente,
       register,
       login,
       loginDemo,
