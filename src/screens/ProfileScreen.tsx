@@ -124,7 +124,29 @@ export function ProfileScreen() {
               <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
             </Pressable>
           </View>
-        ) : null}
+        ) : (
+          <View className="mt-4 overflow-hidden rounded-[8px] border border-slate-200 bg-white">
+            <Pressable
+              onPress={() => navigation.navigate("DemandasAceitas")}
+              className="flex-row items-center justify-between px-5 py-4 active:bg-slate-50"
+            >
+              <View className="flex-1 flex-row items-center gap-3 pr-2">
+                <View className="rounded-[8px] bg-blue-50 p-2">
+                  <Ionicons name="briefcase-outline" size={22} color="#2563eb" />
+                </View>
+                <View className="flex-1">
+                  <Text className="text-base font-semibold text-slate-900">
+                    Demandas aceitas
+                  </Text>
+                  <Text className="mt-0.5 text-sm text-slate-500">
+                    Acertadas no chat
+                  </Text>
+                </View>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#94a3b8" />
+            </Pressable>
+          </View>
+        )}
 
         <Pressable
           onPress={logout}

@@ -7,7 +7,10 @@ import {
   type ReactNode,
 } from "react";
 
-import type { ProfissaoSlug } from "../data/mock";
+import {
+  MOCK_DEMANDAS_ACEITAS_PROFISSIONAL,
+  type ProfissaoSlug,
+} from "../data/mock";
 
 export type UserRole = "cliente" | "profissional";
 
@@ -31,6 +34,19 @@ export type NovaDemandaClienteInput = {
   profissao: ProfissaoSlug;
   orcamentoLabel: string;
   city: string;
+};
+
+export type DemandaProfissionalAceitaStatus = "executada" | "nao_executada";
+
+export type DemandaProfissionalAceita = {
+  id: string;
+  titulo: string;
+  resumo: string;
+  profissao: ProfissaoSlug;
+  city: string;
+  clienteNome: string;
+  combinadoNoChatEm: number;
+  statusExecucao: DemandaProfissionalAceitaStatus;
 };
 
 export type AuthUser = {
@@ -81,10 +97,16 @@ type AuthContextValue = {
   pendingRegistration: RegistrationDraft | null;
   /** Pedidos do cliente (só relevante quando `user.role === "cliente"`). */
   demandasCliente: DemandaCliente[];
+  /** Demandas aceitas no chat (só relevante quando `user.role === "profissional"`). */
+  demandasProfissionalAceitas: DemandaProfissionalAceita[];
   addDemandaCliente: (input: NovaDemandaClienteInput) => void;
   setDemandaClienteStatus: (
     id: string,
     status: DemandaClienteStatus,
+  ) => void;
+  setDemandaProfissionalAceitaStatus: (
+    id: string,
+    status: DemandaProfissionalAceitaStatus,
   ) => void;
   register: (data: RegistrationDraft) => void;
   login: (email: string, password: string) => boolean;
@@ -104,6 +126,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [pendingRegistration, setPendingRegistration] =
     useState<RegistrationDraft | null>(null);
   const [demandasCliente, setDemandasCliente] = useState<DemandaCliente[]>([]);
+  const [demandasProfissionalAceitas, setDemandasProfissionalAceitas] = useState<
+    DemandaProfissionalAceita[]
+  >(() => MOCK_DEMANDAS_ACEITAS_PROFISSIONAL);
 
   const addDemandaCliente = useCallback((input: NovaDemandaClienteInput) => {
     const t = input.titulo.trim();
@@ -126,6 +151,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     (id: string, status: DemandaClienteStatus) => {
       setDemandasCliente((prev) =>
         prev.map((d) => (d.id === id ? { ...d, status } : d)),
+      );
+    },
+    [],
+  );
+
+  const setDemandaProfissionalAceitaStatus = useCallback(
+    (id: string, status: DemandaProfissionalAceitaStatus) => {
+      setDemandasProfissionalAceitas((prev) =>
+        prev.map((d) => (d.id === id ? { ...d, statusExecucao: status } : d)),
       );
     },
     [],
@@ -186,6 +220,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     setUser(null);
     setDemandasCliente([]);
+    setDemandasProfissionalAceitas(MOCK_DEMANDAS_ACEITAS_PROFISSIONAL);
   }, []);
 
   const value = useMemo(
@@ -193,8 +228,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       pendingRegistration,
       demandasCliente,
+      demandasProfissionalAceitas,
       addDemandaCliente,
       setDemandaClienteStatus,
+      setDemandaProfissionalAceitaStatus,
       register,
       login,
       loginDemo,
@@ -204,8 +241,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       pendingRegistration,
       demandasCliente,
+      demandasProfissionalAceitas,
       addDemandaCliente,
       setDemandaClienteStatus,
+      setDemandaProfissionalAceitaStatus,
       register,
       login,
       loginDemo,

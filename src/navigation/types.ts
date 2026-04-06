@@ -19,4 +19,5 @@ export type ProfileStackParamList = {
   PerfilInicio: undefined;
   PedidoNovo: undefined;
   PedidosLista: undefined;
+  DemandasAceitas: undefined;
 };

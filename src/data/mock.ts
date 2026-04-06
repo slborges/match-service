@@ -744,6 +744,54 @@ export const MOCK_PEDIDOS_CLIENTE: PedidoClienteListaMock[] = [
   },
 ];
 
+/**
+ * Demandas já acertadas no chat para o profissional.
+ * Estado editável em sessão: executada / não executada.
+ */
+export type DemandaAceitaProfissionalMock = {
+  id: string;
+  titulo: string;
+  resumo: string;
+  profissao: ProfissaoSlug;
+  city: string;
+  clienteNome: string;
+  combinadoNoChatEm: number;
+  statusExecucao: "executada" | "nao_executada";
+};
+
+export const MOCK_DEMANDAS_ACEITAS_PROFISSIONAL: DemandaAceitaProfissionalMock[] = [
+  {
+    id: "mock-dap-1",
+    titulo: "Troca de 5 tomadas no quarto",
+    resumo: "Cliente pediu instalação com revisão de fiação no mesmo ponto.",
+    profissao: "eletricista",
+    city: "São Paulo — Moema",
+    clienteNome: "Mariana Costa",
+    combinadoNoChatEm: 1_734_009_600_000,
+    statusExecucao: "nao_executada",
+  },
+  {
+    id: "mock-dap-2",
+    titulo: "Pintura de parede da sala",
+    resumo: "Acordado no chat: tinta fosca, uma parede destaque azul petróleo.",
+    profissao: "pintor",
+    city: "Santo André — Campestre",
+    clienteNome: "Rafael Lima",
+    combinadoNoChatEm: 1_733_664_000_000,
+    statusExecucao: "executada",
+  },
+  {
+    id: "mock-dap-3",
+    titulo: "Revisão de torneira com vazamento",
+    resumo: "Cliente relatou pinga contínua. Serviço ficou para sábado de manhã.",
+    profissao: "encanador",
+    city: "São Paulo — Tatuapé",
+    clienteNome: "Patrícia Souza",
+    combinadoNoChatEm: 1_734_182_400_000,
+    statusExecucao: "nao_executada",
+  },
+];
+
 export const MOCK_CHAT_THREADS: ChatThread[] = [
   {
     id: "c1",
