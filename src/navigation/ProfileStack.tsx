@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ClientPedidoNovoScreen } from "../screens/ClientPedidoNovoScreen";
 import { ClientPedidosListaScreen } from "../screens/ClientPedidosListaScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
-import { stackHeaderOptions } from "./stackHeader";
 import type { ProfileStackParamList } from "./types";
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
@@ -23,16 +22,12 @@ export function ProfileStack() {
       <Stack.Screen
         name="PedidoNovo"
         component={ClientPedidoNovoScreen}
-        options={({ navigation }) =>
-          stackHeaderOptions(navigation, "Novo pedido")
-        }
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="PedidosLista"
         component={ClientPedidosListaScreen}
-        options={({ navigation }) =>
-          stackHeaderOptions(navigation, "Os meus pedidos")
-        }
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

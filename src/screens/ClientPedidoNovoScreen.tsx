@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { ScreenHeaderBar } from "../components/ScreenHeaderBar";
 import type { ProfissaoSlug } from "../data/mock";
 import { TAGS_SERVICOS_POPULARES } from "../data/mock";
 import { useAuth } from "../context/AuthContext";
@@ -72,25 +73,36 @@ export function ClientPedidoNovoScreen() {
 
   if (!user || user.role !== "cliente") {
     return (
-      <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
-        <View style={[padH, styles.centered]}>
-          <Ionicons name="lock-closed-outline" size={40} color="#94a3b8" />
-          <Text className="mt-4 text-center text-base text-slate-700">
-            Novo pedido está disponível apenas para contas de cliente.
-          </Text>
-          <Pressable
-            onPress={() => navigation.goBack()}
-            className="mt-6 rounded-[8px] bg-blue-600 px-5 py-3 active:bg-blue-700"
-          >
-            <Text className="font-semibold text-white">Voltar</Text>
-          </Pressable>
-        </View>
-      </SafeAreaView>
+      <View className="flex-1 bg-slate-50">
+        <ScreenHeaderBar
+          title="Novo pedido"
+          onBack={() => navigation.goBack()}
+        />
+        <SafeAreaView className="flex-1" edges={["bottom"]}>
+          <View style={[padH, styles.centered]}>
+            <Ionicons name="lock-closed-outline" size={40} color="#94a3b8" />
+            <Text className="mt-4 text-center text-base text-slate-700">
+              Novo pedido está disponível apenas para contas de cliente.
+            </Text>
+            <Pressable
+              onPress={() => navigation.goBack()}
+              className="mt-6 rounded-[8px] bg-blue-600 px-5 py-3 active:bg-blue-700"
+            >
+              <Text className="font-semibold text-white">Voltar</Text>
+            </Pressable>
+          </View>
+        </SafeAreaView>
+      </View>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom"]}>
+    <View className="flex-1 bg-slate-50">
+      <ScreenHeaderBar
+        title="Novo pedido"
+        onBack={() => navigation.goBack()}
+      />
+      <SafeAreaView className="flex-1" edges={["bottom"]}>
       <ScrollView
         className="flex-1"
         contentContainerStyle={[padH, styles.scrollContent]}
@@ -185,7 +197,8 @@ export function ClientPedidoNovoScreen() {
           <Text className="font-semibold text-white">Publicar pedido</Text>
         </Pressable>
       </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
 

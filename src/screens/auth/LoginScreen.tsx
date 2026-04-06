@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 
+import { ScreenHeaderBar } from "../../components/ScreenHeaderBar";
 import { useAuth } from "../../context/AuthContext";
 import type { AuthStackParamList } from "../../navigation/types";
 
@@ -44,11 +45,13 @@ export function LoginScreen() {
   }, [email, password, login]);
 
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-slate-50"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
+    <View className="flex-1 bg-slate-50">
+      <ScreenHeaderBar title="Entrar" onBack={() => navigation.goBack()} />
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
         className="flex-1"
         contentContainerClassName="grow justify-center px-5 pb-10 pt-4"
         keyboardShouldPersistTaps="handled"
@@ -134,5 +137,6 @@ export function LoginScreen() {
         </Pressable>
       </ScrollView>
     </KeyboardAvoidingView>
+    </View>
   );
 }

@@ -13,6 +13,7 @@ import {
   View,
 } from "react-native";
 
+import { ScreenHeaderBar } from "../../components/ScreenHeaderBar";
 import { useAuth } from "../../context/AuthContext";
 import type { AuthStackParamList } from "../../navigation/types";
 
@@ -94,12 +95,20 @@ export function RegisterScreen() {
       ? "Ex.: eletricista, canalização, limpeza…"
       : "Ex.: instalações elétricas, pintura, montagem…";
 
+  const headerTitle =
+    perfil === "cliente" ? "Cadastro — Cliente" : "Cadastro — Profissional";
+
   return (
-    <KeyboardAvoidingView
-      className="flex-1 bg-slate-50"
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <ScrollView
+    <View className="flex-1 bg-slate-50">
+      <ScreenHeaderBar
+        title={headerTitle}
+        onBack={() => navigation.goBack()}
+      />
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        <ScrollView
         className="flex-1"
         contentContainerClassName="px-5 pb-10 pt-2"
         keyboardShouldPersistTaps="handled"
@@ -175,6 +184,7 @@ export function RegisterScreen() {
         </Text>
       </ScrollView>
     </KeyboardAvoidingView>
+    </View>
   );
 }
 

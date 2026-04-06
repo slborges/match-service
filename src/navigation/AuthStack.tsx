@@ -4,7 +4,6 @@ import { LoginScreen } from "../screens/auth/LoginScreen";
 import { RegisterScreen } from "../screens/auth/RegisterScreen";
 import { WelcomeScreen } from "../screens/auth/WelcomeScreen";
 import type { AuthStackParamList } from "./types";
-import { stackHeaderOptions } from "./stackHeader";
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -24,19 +23,12 @@ export function AuthStack() {
       <Stack.Screen
         name="Cadastro"
         component={RegisterScreen}
-        options={({ navigation, route }) =>
-          stackHeaderOptions(
-            navigation,
-            route.params.perfil === "cliente"
-              ? "Cadastro — Cliente"
-              : "Cadastro — Profissional",
-          )
-        }
+        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="Login"
         component={LoginScreen}
-        options={({ navigation }) => stackHeaderOptions(navigation, "Entrar")}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );
