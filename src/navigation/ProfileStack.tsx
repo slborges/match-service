@@ -2,6 +2,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { ClientPedidoNovoScreen } from "../screens/ClientPedidoNovoScreen";
 import { ClientPedidosListaScreen } from "../screens/ClientPedidosListaScreen";
+import { ConfirmActionScreen } from "../screens/ConfirmActionScreen";
 import { ProfDemandasAceitasScreen } from "../screens/ProfDemandasAceitasScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import type { ProfileStackParamList } from "./types";
@@ -33,6 +34,11 @@ export function ProfileStack() {
       <Stack.Screen
         name="DemandasAceitas"
         component={ProfDemandasAceitasScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="ConfirmarAcao"
+        component={ConfirmActionScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -1,17 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useCallback, useMemo } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useMemo } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScreenHeaderBar } from "../components/ScreenHeaderBar";
 import { LABEL_PROFISSAO, MOCK_PEDIDOS_CLIENTE } from "../data/mock";
-import {
-  useAuth,
-  type DemandaCliente,
-  type DemandaClienteStatus,
-} from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
 import type { ProfileStackParamList } from "../navigation/types";
 
 function formatDataCriada(ts: number): string {
@@ -34,8 +30,6 @@ export function ClientPedidosListaScreen() {
     user,
     demandasCliente,
     demandasProfissionalAceitas,
-    setDemandaClienteStatus,
-    confirmarExecucaoDemandaCliente,
   } = useAuth();
 
   const padH = {
@@ -52,15 +46,6 @@ export function ClientPedidosListaScreen() {
 
   const listaSoExemplosMock = demandasCliente.length === 0;
 
-  const alternarStatus = useCallback(
-    (d: DemandaCliente) => {
-      const next: DemandaClienteStatus =
-        d.status === "pendente" ? "atendida" : "pendente";
-      setDemandaClienteStatus(d.id, next);
-    },
-    [setDemandaClienteStatus],
-  );
-
   const porDemandaClienteAguardando = useMemo(
     () =>
       new Map(
@@ -73,25 +58,6 @@ export function ClientPedidosListaScreen() {
           .map((d) => [d.demandaClienteId as string, d]),
       ),
     [demandasProfissionalAceitas],
-  );
-
-  const confirmarExecucao = useCallback(
-    (demandaClienteId: string) => {
-      Alert.alert(
-        "Confirmar execução",
-        "Confirma que a demanda foi executada? Esta ação conclui o pedido no seu perfil e no perfil do profissional.",
-        [
-          { text: "Cancelar", style: "cancel" },
-          {
-            text: "Confirmar",
-            onPress: () => {
-              confirmarExecucaoDemandaCliente(demandaClienteId);
-            },
-          },
-        ],
-      );
-    },
-    [confirmarExecucaoDemandaCliente],
   );
 
   if (!user || user.role !== "cliente") {
@@ -166,17 +132,27 @@ export function ClientPedidosListaScreen() {
                   </Text>
                   <View
                     className={`rounded-[8px] px-2 py-1 ${
-                      d.status === "atendida" ? "bg-emerald-100" : "bg-amber-100"
+                      d.status === "atendida"
+                        ? "bg-emerald-100"
+                        : d.status === "cancelada"
+                          ? "bg-rose-100"
+                          : "bg-amber-100"
                     }`}
                   >
                     <Text
                       className={`text-xs font-semibold ${
                         d.status === "atendida"
                           ? "text-emerald-800"
-                          : "text-amber-900"
+                          : d.status === "cancelada"
+                            ? "text-rose-800"
+                            : "text-amber-900"
                       }`}
                     >
-                      {d.status === "atendida" ? "Atendida" : "Não atendida"}
+                      {d.status === "atendida"
+                        ? "Atendida"
+                        : d.status === "cancelada"
+                          ? "Cancelada"
+                          : "Não atendida"}
                     </Text>
                   </View>
                 </View>
@@ -192,13 +168,45 @@ export function ClientPedidosListaScreen() {
                   </Text>
                 ) : null}
                 <Text className="mt-1 text-sm text-slate-600">📍 {d.city}</Text>
-                {demandaAguardando ? (
+                {d.status === "pendente" ? (
                   <>
-                    <Text className="mt-3 text-xs text-blue-700">
-                      O profissional marcou esta demanda como executada e aguarda sua confirmação.
-                    </Text>
+                    {demandaAguardando ? (
+                      <Text className="mt-3 text-xs text-blue-700">
+                        O profissional marcou esta demanda como executada e aguarda sua confirmação.
+                      </Text>
+                    ) : (
+                      <Text className="mt-3 text-xs text-slate-500">
+                        Você já pode confirmar a execução desta demanda.
+                      </Text>
+                    )}
                     <Pressable
-                      onPress={() => confirmarExecucao(d.id)}
+                      onPress={() =>
+                        navigation.navigate("ConfirmarAcao", {
+                          tipo: "cli-cancelar-demanda",
+                          demandaClienteId: d.id,
+                          titulo: "Cancelar demanda",
+                          mensagem:
+                            "Esta demanda será cancelada para cliente e profissional. A ação não poderá ser revertida.",
+                          confirmarLabel: "Cancelar",
+                        })
+                      }
+                      className="mt-2 self-start rounded-[8px] border border-rose-200 bg-rose-50 px-3 py-2 active:bg-rose-100"
+                    >
+                      <Text className="text-sm font-medium text-rose-800">
+                        Cancelar
+                      </Text>
+                    </Pressable>
+                    <Pressable
+                      onPress={() =>
+                        navigation.navigate("ConfirmarAcao", {
+                          tipo: "cli-confirmar-execucao",
+                          demandaClienteId: d.id,
+                          titulo: "Confirmar execução",
+                          mensagem:
+                            "Ao confirmar execução, a demanda será concluída para você e para o profissional. Esta ação não poderá ser desfeita.",
+                          confirmarLabel: "Confirmar execução",
+                        })
+                      }
                       className="mt-2 self-start rounded-[8px] border border-blue-200 bg-blue-50 px-3 py-2 active:bg-blue-100"
                     >
                       <Text className="text-sm font-medium text-blue-800">
@@ -210,18 +218,7 @@ export function ClientPedidosListaScreen() {
                   <Text className="mt-3 text-xs text-slate-400">
                     Pedido de exemplo (mock)
                   </Text>
-                ) : (
-                  <Pressable
-                    onPress={() => alternarStatus(d)}
-                    className="mt-3 self-start rounded-[8px] border border-slate-200 bg-slate-50 px-3 py-2 active:bg-slate-100"
-                  >
-                    <Text className="text-sm font-medium text-slate-700">
-                      {d.status === "pendente"
-                        ? "Marcar como atendida"
-                        : "Marcar como não atendida"}
-                    </Text>
-                  </Pressable>
-                )}
+                ) : null}
                     </>
                   );
                 })()}

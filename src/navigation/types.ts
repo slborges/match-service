@@ -20,4 +20,16 @@ export type ProfileStackParamList = {
   PedidoNovo: undefined;
   PedidosLista: undefined;
   DemandasAceitas: undefined;
+  ConfirmarAcao: {
+    tipo:
+      | "prof-confirmar-execucao"
+      | "prof-cancelar-demanda"
+      | "cli-confirmar-execucao"
+      | "cli-cancelar-demanda";
+    demandaProfissionalId?: string;
+    demandaClienteId?: string;
+    titulo: string;
+    mensagem: string;
+    confirmarLabel: string;
+  };
 };
