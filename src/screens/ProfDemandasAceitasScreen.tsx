@@ -2,7 +2,14 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useCallback, useMemo } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  Alert,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScreenHeaderBar } from "../components/ScreenHeaderBar";
@@ -49,11 +56,27 @@ export function ProfDemandasAceitasScreen() {
     [demandasProfissionalAceitas],
   );
 
-  const alternarStatus = useCallback(
+  const confirmarExecucao = useCallback(
     (d: DemandaProfissionalAceita) => {
-      const next: DemandaProfissionalAceitaStatus =
-        d.statusExecucao === "executada" ? "nao_executada" : "executada";
-      setDemandaProfissionalAceitaStatus(d.id, next);
+      if (d.statusExecucao !== "nao_executada") return;
+
+      Alert.alert(
+        "Confirmar marcacao",
+        "Ao marcar esta demanda como executada, ela ira para aguardando confirmacao do cliente e nao podera ser desmarcada pelo profissional.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Confirmar",
+            style: "default",
+            onPress: () => {
+              setDemandaProfissionalAceitaStatus(
+                d.id,
+                "aguardando_confirmacao_cliente",
+              );
+            },
+          },
+        ],
+      );
     },
     [setDemandaProfissionalAceitaStatus],
   );
@@ -116,25 +139,28 @@ export function ProfDemandasAceitasScreen() {
                     <Text className="flex-1 text-base font-semibold text-slate-900">
                       {d.titulo}
                     </Text>
-                    <View
-                      className={`rounded-[8px] px-2 py-1 ${
-                        d.statusExecucao === "executada"
-                          ? "bg-emerald-100"
-                          : "bg-amber-100"
-                      }`}
-                    >
-                      <Text
-                        className={`text-xs font-semibold ${
+                    {d.statusExecucao === "executada" ||
+                    d.statusExecucao === "nao_executada" ? (
+                      <View
+                        className={`rounded-[8px] px-2 py-1 ${
                           d.statusExecucao === "executada"
-                            ? "text-emerald-800"
-                            : "text-amber-900"
+                            ? "bg-emerald-100"
+                            : "bg-amber-100"
                         }`}
                       >
-                        {d.statusExecucao === "executada"
-                          ? "Executada"
-                          : "Nao executada"}
-                      </Text>
-                    </View>
+                        <Text
+                          className={`text-xs font-semibold ${
+                            d.statusExecucao === "executada"
+                              ? "text-emerald-800"
+                              : "text-amber-900"
+                          }`}
+                        >
+                          {d.statusExecucao === "executada"
+                            ? "Executada"
+                            : "Nao executada"}
+                        </Text>
+                      </View>
+                    ) : null}
                   </View>
                   <Text className="mt-1 text-xs text-slate-500">
                     {LABEL_PROFISSAO[d.profissao]} ·{" "}
@@ -147,16 +173,24 @@ export function ProfDemandasAceitasScreen() {
                     Cliente: {d.clienteNome}
                   </Text>
                   <Text className="mt-1 text-sm text-slate-600">📍 {d.city}</Text>
-                  <Pressable
-                    onPress={() => alternarStatus(d)}
-                    className="mt-3 self-start rounded-[8px] border border-slate-200 bg-slate-50 px-3 py-2 active:bg-slate-100"
-                  >
-                    <Text className="text-sm font-medium text-slate-700">
-                      {d.statusExecucao === "executada"
-                        ? "Marcar como nao executada"
-                        : "Marcar como executada"}
+                  {d.statusExecucao === "nao_executada" ? (
+                    <Pressable
+                      onPress={() => confirmarExecucao(d)}
+                      className="mt-3 self-start rounded-[8px] border border-slate-200 bg-slate-50 px-3 py-2 active:bg-slate-100"
+                    >
+                      <Text className="text-sm font-medium text-slate-700">
+                        Marcar como executada
+                      </Text>
+                    </Pressable>
+                  ) : d.statusExecucao === "aguardando_confirmacao_cliente" ? (
+                    <Text className="mt-3 text-xs text-blue-700">
+                      Aguardando confirmacao do cliente.
                     </Text>
-                  </Pressable>
+                  ) : (
+                    <Text className="mt-3 text-xs text-emerald-700">
+                      Confirmada como executada pelo cliente.
+                    </Text>
+                  )}
                 </View>
               ))}
             </View>

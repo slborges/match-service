@@ -753,10 +753,14 @@ export type DemandaAceitaProfissionalMock = {
   titulo: string;
   resumo: string;
   profissao: ProfissaoSlug;
+  imageUrl: string;
   city: string;
   clienteNome: string;
   combinadoNoChatEm: number;
-  statusExecucao: "executada" | "nao_executada";
+  statusExecucao:
+    | "nao_executada"
+    | "aguardando_confirmacao_cliente"
+    | "executada";
 };
 
 export const MOCK_DEMANDAS_ACEITAS_PROFISSIONAL: DemandaAceitaProfissionalMock[] = [
@@ -765,6 +769,7 @@ export const MOCK_DEMANDAS_ACEITAS_PROFISSIONAL: DemandaAceitaProfissionalMock[]
     titulo: "Troca de 5 tomadas no quarto",
     resumo: "Cliente pediu instalação com revisão de fiação no mesmo ponto.",
     profissao: "eletricista",
+    imageUrl: IMAGEM_CARD_PROFISSAO.eletricista,
     city: "São Paulo — Moema",
     clienteNome: "Mariana Costa",
     combinadoNoChatEm: 1_734_009_600_000,
@@ -775,16 +780,18 @@ export const MOCK_DEMANDAS_ACEITAS_PROFISSIONAL: DemandaAceitaProfissionalMock[]
     titulo: "Pintura de parede da sala",
     resumo: "Acordado no chat: tinta fosca, uma parede destaque azul petróleo.",
     profissao: "pintor",
+    imageUrl: IMAGEM_CARD_PROFISSAO.pintor,
     city: "Santo André — Campestre",
     clienteNome: "Rafael Lima",
     combinadoNoChatEm: 1_733_664_000_000,
-    statusExecucao: "executada",
+    statusExecucao: "aguardando_confirmacao_cliente",
   },
   {
     id: "mock-dap-3",
     titulo: "Revisão de torneira com vazamento",
     resumo: "Cliente relatou pinga contínua. Serviço ficou para sábado de manhã.",
     profissao: "encanador",
+    imageUrl: IMAGEM_CARD_PROFISSAO.encanador,
     city: "São Paulo — Tatuapé",
     clienteNome: "Patrícia Souza",
     combinadoNoChatEm: 1_734_182_400_000,

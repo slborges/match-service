@@ -36,13 +36,17 @@ export type NovaDemandaClienteInput = {
   city: string;
 };
 
-export type DemandaProfissionalAceitaStatus = "executada" | "nao_executada";
+export type DemandaProfissionalAceitaStatus =
+  | "nao_executada"
+  | "aguardando_confirmacao_cliente"
+  | "executada";
 
 export type DemandaProfissionalAceita = {
   id: string;
   titulo: string;
   resumo: string;
   profissao: ProfissaoSlug;
+  imageUrl: string;
   city: string;
   clienteNome: string;
   combinadoNoChatEm: number;
