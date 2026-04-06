@@ -7,7 +7,31 @@ import {
   type ReactNode,
 } from "react";
 
+import type { ProfissaoSlug } from "../data/mock";
+
 export type UserRole = "cliente" | "profissional";
+
+/** Pedido criado pelo cliente no perfil (mock local até existir API). */
+export type DemandaClienteStatus = "pendente" | "atendida";
+
+export type DemandaCliente = {
+  id: string;
+  titulo: string;
+  resumo: string;
+  profissao: ProfissaoSlug;
+  orcamentoLabel: string;
+  city: string;
+  status: DemandaClienteStatus;
+  criadaEm: number;
+};
+
+export type NovaDemandaClienteInput = {
+  titulo: string;
+  resumo: string;
+  profissao: ProfissaoSlug;
+  orcamentoLabel: string;
+  city: string;
+};
 
 export type AuthUser = {
   id: string;
@@ -55,6 +79,13 @@ type AuthContextValue = {
   user: AuthUser | null;
   /** Último cadastro mock — usado no login após registo */
   pendingRegistration: RegistrationDraft | null;
+  /** Pedidos do cliente (só relevante quando `user.role === "cliente"`). */
+  demandasCliente: DemandaCliente[];
+  addDemandaCliente: (input: NovaDemandaClienteInput) => void;
+  setDemandaClienteStatus: (
+    id: string,
+    status: DemandaClienteStatus,
+  ) => void;
   register: (data: RegistrationDraft) => void;
   login: (email: string, password: string) => boolean;
   /** Entrada instantânea com perfil de demonstração (cliente ou profissional). */
@@ -64,10 +95,41 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+function novoIdDemandaCliente(): string {
+  return `dc-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [pendingRegistration, setPendingRegistration] =
     useState<RegistrationDraft | null>(null);
+  const [demandasCliente, setDemandasCliente] = useState<DemandaCliente[]>([]);
+
+  const addDemandaCliente = useCallback((input: NovaDemandaClienteInput) => {
+    const t = input.titulo.trim();
+    const r = input.resumo.trim();
+    if (!t || !r) return;
+    const row: DemandaCliente = {
+      id: novoIdDemandaCliente(),
+      titulo: t,
+      resumo: r,
+      profissao: input.profissao,
+      orcamentoLabel: input.orcamentoLabel.trim(),
+      city: input.city.trim() || "—",
+      status: "pendente",
+      criadaEm: Date.now(),
+    };
+    setDemandasCliente((prev) => [row, ...prev]);
+  }, []);
+
+  const setDemandaClienteStatus = useCallback(
+    (id: string, status: DemandaClienteStatus) => {
+      setDemandasCliente((prev) =>
+        prev.map((d) => (d.id === id ? { ...d, status } : d)),
+      );
+    },
+    [],
+  );
 
   const register = useCallback((data: RegistrationDraft) => {
     setPendingRegistration(data);
@@ -123,18 +185,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     setUser(null);
+    setDemandasCliente([]);
   }, []);
 
   const value = useMemo(
     () => ({
       user,
       pendingRegistration,
+      demandasCliente,
+      addDemandaCliente,
+      setDemandaClienteStatus,
       register,
       login,
       loginDemo,
       logout,
     }),
-    [user, pendingRegistration, register, login, loginDemo, logout],
+    [
+      user,
+      pendingRegistration,
+      demandasCliente,
+      addDemandaCliente,
+      setDemandaClienteStatus,
+      register,
+      login,
+      loginDemo,
+      logout,
+    ],
   );
 
   return (

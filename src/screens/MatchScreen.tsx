@@ -23,7 +23,6 @@ import {
 import {
   filterDemandas,
   filterProfessionals,
-  imagemDemanda,
   LABEL_PROFISSAO,
   MOCK_DEMANDAS,
   MOCK_PROFESSIONALS,
@@ -406,7 +405,7 @@ function SwipeableDemandaCard({
       screenWidth={screenWidth}
       onSwipeLeft={onSwipeLeft}
       onSwipeRight={onSwipeRight}
-      imageUri={imagemDemanda(demanda)}
+      imageUri={demanda.imageUrl}
     >
       <LinearGradient
         colors={[

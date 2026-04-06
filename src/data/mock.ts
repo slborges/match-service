@@ -7,11 +7,13 @@
  * 2. **Perfil do cliente** — quem contrata (conta separada; mock em `AuthContext` / ecrãs de auth).
  * 3. **Tipo / oferta de serviço** — categoria de trabalho (cards na Busca, filtros). Editável em
  *    `IMAGENS_CARDS_POR_SERVICO` — não confundir com a foto do profissional.
+ * 4. **Oportunidades (pedidos)** — mesmo padrão que profissionais: `BLOCOS_DEMANDA[]` com tuplas de 5 por
+ *    campo (títulos, imagens da oportunidade, etc.) e `montarDemandas()` gera `MOCK_DEMANDAS`.
  */
 
 export type UserRole = "cliente" | "profissional";
 
-/** Cinco profissões; há 5 profissionais mock por profissão (25 no total). */
+/** Cinco profissões; há 5 profissionais e 5 oportunidades mock por profissão (25 + 25 itens). */
 export type ProfissaoSlug =
   | "eletricista"
   | "diarista"
@@ -371,6 +373,249 @@ export const IMAGEM_CARD_PROFISSAO: Record<ProfissaoSlug, string> =
     {} as Record<ProfissaoSlug, string>,
   );
 
+/** Prefixo curto para `id` das demandas (`d-ele-1` … `d-ele-5`), alinhado a `montarProfissionais`. */
+const PREFIX_DEMANDA: Record<ProfissaoSlug, string> = {
+  eletricista: "ele",
+  diarista: "dia",
+  pedreiro: "ped",
+  encanador: "enc",
+  pintor: "pin",
+};
+
+/**
+ * Bloco de oportunidades por profissão — **cinco pedidos** por serviço (mesma ideia que `BlocoProfissao`).
+ * Edite as tuplas à mão; `imagensOportunidade` segue o papel de `fotosPerfil`.
+ */
+type BlocoDemanda = {
+  profissao: ProfissaoSlug;
+  titulos: [string, string, string, string, string];
+  resumos: [string, string, string, string, string];
+  orcamentoLabels: [string, string, string, string, string];
+  cidades: [string, string, string, string, string];
+  publicadoEm: [string, string, string, string, string];
+  /**
+   * Imagem de cada oportunidade (mesma ordem que `titulos`).
+   * Troque o URL à mão; no produto virá do upload do cliente.
+   */
+  imagensOportunidade: [string, string, string, string, string];
+  solicitantesLabels: [
+    string | undefined,
+    string | undefined,
+    string | undefined,
+    string | undefined,
+    string | undefined,
+  ];
+};
+
+const BLOCOS_DEMANDA: BlocoDemanda[] = [
+  {
+    profissao: "eletricista",
+    titulos: [
+      "Trocar quadro monofásico para trifásico",
+      "Instalar tomadas 220 V na cozinha",
+      "Iluminação LED em escritório",
+      "Aterramento e SPDA em cobertura",
+      "Trocar disjuntor geral com cheiro a queimado",
+    ],
+    resumos: [
+      "Apartamento 80 m², preciso adequação do quadro e novos disjuntores.",
+      "4 pontos novos, eletroduto aparente aceitável.",
+      "Projeto com 12 spots, preciso laudo se necessário.",
+      "Casa térrea, preciso laudo e execução conforme norma.",
+      "Quadro antigo, odor forte; avaliar cabos.",
+    ],
+    orcamentoLabels: [
+      "Até R$ 2.500",
+      "R$ 400 – 700",
+      "Sob consulta",
+      "A partir de R$ 3.200",
+      "Emergência — orçar",
+    ],
+    cidades: [
+      "São Paulo — Vila Mariana",
+      "Guarulhos — Centro",
+      "Barueri — Alphaville",
+      "São Paulo — Ipiranga",
+      "São Paulo — Brooklin",
+    ],
+    publicadoEm: ["Hoje", "Ontem", "Há 2 dias", "Há 1 semana", "Hoje"],
+    imagensOportunidade: [
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSVD9QG2WXEPxiy2cDcnz7fytyCm4t6HoWzzQ&s",
+      "https://images.tcdn.com.br/img/img_prod/1018775/conjunto_1_tomada_2p_t_10a_250v_interruptor_simples_10a_250v_4x2_br_clean_margirius_1273_2_c1f35a8b75cb47b6f12606522f91ad79.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQfdORyoklANRpeoM90YLPKuQqYQca6rKEFAw&s",
+      "https://enetec.net.br/wp-content/uploads/2023/10/ChatGPT-Image-1-de-mai.-de-2025-19_20_44-683x1024.png",
+      "https://m.media-amazon.com/images/I/71VAV9AS3PL.jpg",
+    ],
+    solicitantesLabels: [
+      "Cliente — Mariana T.",
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ],
+  },
+  {
+    profissao: "diarista",
+    titulos: [
+      "Limpeza pós-obra em apartamento",
+      "Faxina semanal — 3 cômodos",
+      "Organização de closet e limpeza",
+      "Limpeza pós-evento em salão",
+      "Lavar estofados e tapetes",
+    ],
+    resumos: [
+      "Poeira fina, vidros e armários embutidos.",
+      "Preferência quartas ou quintas pela manhã.",
+      "Cliente fornece caixas; foco em dobrar e etiquetar.",
+      "Lavar piso, retirar lixo e desmontar mesas.",
+      "Sofá 3 lugares + 2 tapetes; produtos neutros.",
+    ],
+    orcamentoLabels: [
+      "R$ 350 diária",
+      "R$ 45/h",
+      "R$ 200 – 280",
+      "R$ 600 pacote",
+      "R$ 280",
+    ],
+    cidades: [
+      "São Paulo — Mooca",
+      "Santo André — Centro",
+      "Osasco",
+      "São Paulo — Tatuapé",
+      "Guarulhos — Jardim",
+    ],
+    publicadoEm: ["Hoje", "Ontem", "Há 3 dias", "Ontem", "Há 4 dias"],
+    imagensOportunidade: [
+      "https://img.freepik.com/fotos-gratis/homem-operando-equipamento-especial-de-limpeza-de-canteiro-de-obras_259150-57675.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://img.freepik.com/fotos-gratis/mulher-jovem-com-luvas-de-borracha-segurando-um-pano-e-material-de-limpeza-limpando-a-mesa-parecendo-confiante-na-luz-da-sala-de-estar_141793-101757.jpg?semt=ais_hybrid&w=740&q=80",
+      "https://i.pinimg.com/originals/9b/1e/39/9b1e39df1692c93a96948db33e3e90ce.jpg",
+      "https://media-cdn.tripadvisor.com/media/photo-s/18/d8/3a/a8/o-terraco-salao-de-festas.jpg",
+      "https://preview.redd.it/living-room-rug-is-dirty-its-100-polyester-per-tag-v0-qafew8uexcyb1.jpg?width=640&crop=smart&auto=webp&s=2fb31d3d631a62855663e56676ef40bb75270e6e",
+    ],
+    solicitantesLabels: [undefined, undefined, undefined, undefined, undefined],
+  },
+  {
+    profissao: "pedreiro",
+    titulos: [
+      "Rebocar parede da sala",
+      "Chapisco e contrapiso em área externa",
+      "Abrir vão para porta de correr",
+      "Construir muro de divisa — 8 m",
+      "Assentar piso porcelanato 60×60",
+    ],
+    resumos: [
+      "Aprox. 25 m², preparação para pintura.",
+      "12 m², precisa impermeabilização.",
+      "Alvenaria com 15 cm, com acabamento.",
+      "Com fundação e acabamento em massa.",
+      "Sala 20 m², contrapiso já nivelado.",
+    ],
+    orcamentoLabels: [
+      "Material incluso — orçar",
+      "Até R$ 1.800",
+      "R$ 900 – 1.200",
+      "Sob consulta",
+      "R$ 90/m²",
+    ],
+    cidades: [
+      "São Paulo — Itaquera",
+      "Taboão da Serra",
+      "São Bernardo — Centro",
+      "São Paulo — Penha",
+      "São Caetano — Centro",
+    ],
+    publicadoEm: ["Hoje", "Ontem", "Há 4 dias", "Há 6 dias", "Ontem"],
+    imagensOportunidade: [
+      "https://eldoradomaterial.com.br/wp-content/uploads/2024/05/tijolo-6-furos-eldorado-material-materiais-de-construcao-sitio-cercado-xapinhal-curitiba-2.png",
+      "https://eldoradomaterial.com.br/wp-content/uploads/2024/05/tijolo-6-furos-eldorado-material-materiais-de-construcao-sitio-cercado-xapinhal-curitiba-2.png",
+      "https://eldoradomaterial.com.br/wp-content/uploads/2024/05/tijolo-6-furos-eldorado-material-materiais-de-construcao-sitio-cercado-xapinhal-curitiba-2.png",
+      "https://eldoradomaterial.com.br/wp-content/uploads/2024/05/tijolo-6-furos-eldorado-material-materiais-de-construcao-sitio-cercado-xapinhal-curitiba-2.png",
+      "https://eldoradomaterial.com.br/wp-content/uploads/2024/05/tijolo-6-furos-eldorado-material-materiais-de-construcao-sitio-cercado-xapinhal-curitiba-2.png",
+    ],
+    solicitantesLabels: [undefined, undefined, undefined, undefined, undefined],
+  },
+  {
+    profissao: "encanador",
+    titulos: [
+      "Vazamento em registro do chuveiro",
+      "Instalar torneira e sifão novos",
+      "Desentupir ralo da lavanderia",
+      "Trocar caixa acoplada e engate flexível",
+      "Instalar aquecedor a gás",
+    ],
+    resumos: [
+      "Apartamento, torneira gotejando há uma semana.",
+      "Compras feitas pelo cliente; só instalação.",
+      "Máquina de alta pressão se preciso.",
+      "Banheiro social, vazamento leve na borracha.",
+      "Ventilação conforme norma; ponto de gás existente.",
+    ],
+    orcamentoLabels: [
+      "Até R$ 250",
+      "R$ 180",
+      "R$ 120 – 200",
+      "R$ 320",
+      "Até R$ 450",
+    ],
+    cidades: [
+      "São Paulo — Perdizes",
+      "Cotia — Granja Viana",
+      "São Paulo — Butantã",
+      "São Paulo — Moema",
+      "São Paulo — Vila Prudente",
+    ],
+    publicadoEm: ["Hoje", "Ontem", "Há 2 dias", "Há 3 dias", "Hoje"],
+    imagensOportunidade: [
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTid8314m_Cuujue8f3Wo_RvVrBNQb_6RMjcw&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTid8314m_Cuujue8f3Wo_RvVrBNQb_6RMjcw&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTid8314m_Cuujue8f3Wo_RvVrBNQb_6RMjcw&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTid8314m_Cuujue8f3Wo_RvVrBNQb_6RMjcw&s",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTid8314m_Cuujue8f3Wo_RvVrBNQb_6RMjcw&s",
+    ],
+    solicitantesLabels: [undefined, undefined, undefined, undefined, undefined],
+  },
+  {
+    profissao: "pintor",
+    titulos: [
+      "Pintar 2 quartos + teto",
+      "Pintura externa de muro — 40 m linear",
+      "Acabamento fino sala integrada",
+      "Pintar fachada com textura",
+      "Restaurar móveis com laca",
+    ],
+    resumos: [
+      "Massa corrida ok; cor já escolhida (branco gelo).",
+      "Textura acrílica, duas demãos.",
+      "Rodapés e cantos com fita; acabamento premium.",
+      "Sobreamento, duas cores; preparação de emboço.",
+      "Armário de cozinha e aparador; lixamento fino.",
+    ],
+    orcamentoLabels: [
+      "R$ 28–32/m²",
+      "Sob consulta",
+      "Acima de R$ 4.000",
+      "Sob consulta",
+      "R$ 1.200 – 1.800",
+    ],
+    cidades: [
+      "São Paulo — Santana",
+      "Mauá — Centro",
+      "Diadema — Centro",
+      "São Bernardo — Rudge Ramos",
+      "São Paulo — Vila Mariana",
+    ],
+    publicadoEm: ["Hoje", "Ontem", "Há 5 dias", "Há 1 semana", "Ontem"],
+    imagensOportunidade: [
+      "https://images.pexels.com/photos/221027/pexels-photo-221027.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+      "https://images.pexels.com/photos/221027/pexels-photo-221027.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+      "https://images.pexels.com/photos/221027/pexels-photo-221027.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+      "https://images.pexels.com/photos/221027/pexels-photo-221027.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+      "https://images.pexels.com/photos/221027/pexels-photo-221027.jpeg?auto=compress&cs=tinysrgb&w=640&h=800&fit=crop",
+    ],
+    solicitantesLabels: [undefined, undefined, undefined, undefined, undefined],
+  },
+];
+
 /** Pedidos / “empregos” mock — visão do profissional no Descobrir (mesmo fluxo swipe do cliente). */
 export interface DemandaServico {
   id: string;
@@ -382,6 +627,35 @@ export interface DemandaServico {
   publicadoEm: string;
   /** Nome fictício do cliente que publicou (demo). */
   solicitanteLabel?: string;
+  /** Imagem da oportunidade (mock: `BLOCOS_DEMANDA[].imagensOportunidade`; depois: upload). */
+  imageUrl: string;
+}
+
+function montarDemandas(): DemandaServico[] {
+  const lista: DemandaServico[] = [];
+  for (const bloco of BLOCOS_DEMANDA) {
+    const prefix = PREFIX_DEMANDA[bloco.profissao];
+    for (let i = 0; i < 5; i++) {
+      const n = i + 1;
+      const sol = bloco.solicitantesLabels[i];
+      const base: DemandaServico = {
+        id: `d-${prefix}-${n}`,
+        profissao: bloco.profissao,
+        titulo: bloco.titulos[i],
+        resumo: bloco.resumos[i],
+        orcamentoLabel: bloco.orcamentoLabels[i],
+        city: bloco.cidades[i],
+        publicadoEm: bloco.publicadoEm[i],
+        imageUrl: bloco.imagensOportunidade[i],
+      };
+      lista.push(
+        sol !== undefined && sol !== ""
+          ? { ...base, solicitanteLabel: sol }
+          : base,
+      );
+    }
+  }
+  return lista;
 }
 
 /** Filtro de ofertas por profissão e texto (igual ideia a `filterProfessionals`). */
@@ -407,149 +681,20 @@ export function filterDemandas(
   return result;
 }
 
-/** Imagem de fundo do card de oferta — mesma imagem temática da profissão (editável em `IMAGENS_CARDS_POR_SERVICO`). */
-export function imagemDemanda(d: DemandaServico): string {
-  return IMAGEM_CARD_PROFISSAO[d.profissao];
-}
+export const MOCK_DEMANDAS: DemandaServico[] = montarDemandas();
 
-export const MOCK_DEMANDAS: DemandaServico[] = [
-  {
-    id: "d-ele-1",
-    profissao: "eletricista",
-    titulo: "Trocar quadro monofásico para trifásico",
-    resumo: "Apartamento 80 m², preciso adequação do quadro e novos disjuntores.",
-    orcamentoLabel: "Até R$ 2.500",
-    city: "São Paulo — Vila Mariana",
-    publicadoEm: "Hoje",
-    solicitanteLabel: "Cliente — Mariana T.",
+/** Mapa opcional: profissão → lista (5 oportunidades mock por profissão). */
+export const MOCK_DEMANDAS_POR_PROFISSAO: Record<
+  ProfissaoSlug,
+  DemandaServico[]
+> = MOCK_DEMANDAS.reduce(
+  (acc, d) => {
+    if (!acc[d.profissao]) acc[d.profissao] = [];
+    acc[d.profissao].push(d);
+    return acc;
   },
-  {
-    id: "d-ele-2",
-    profissao: "eletricista",
-    titulo: "Instalar tomadas 220 V na cozinha",
-    resumo: "4 pontos novos, eletroduto aparente aceitável.",
-    orcamentoLabel: "R$ 400 – 700",
-    city: "Guarulhos — Centro",
-    publicadoEm: "Ontem",
-  },
-  {
-    id: "d-ele-3",
-    profissao: "eletricista",
-    titulo: "Iluminação LED em escritório",
-    resumo: "Projeto com 12 spots, preciso laudo se necessário.",
-    orcamentoLabel: "Sob consulta",
-    city: "Barueri — Alphaville",
-    publicadoEm: "Há 2 dias",
-  },
-  {
-    id: "d-dia-1",
-    profissao: "diarista",
-    titulo: "Limpeza pós-obra em apartamento",
-    resumo: "Poeira fina, vidros e armários embutidos.",
-    orcamentoLabel: "R$ 350 diária",
-    city: "São Paulo — Mooca",
-    publicadoEm: "Hoje",
-  },
-  {
-    id: "d-dia-2",
-    profissao: "diarista",
-    titulo: "Faxina semanal — 3 cômodos",
-    resumo: "Preferência quartas ou quintas pela manhã.",
-    orcamentoLabel: "R$ 45/h",
-    city: "Santo André — Centro",
-    publicadoEm: "Ontem",
-  },
-  {
-    id: "d-dia-3",
-    profissao: "diarista",
-    titulo: "Organização de closet e limpeza",
-    resumo: "Cliente fornece caixas; foco em dobrar e etiquetar.",
-    orcamentoLabel: "R$ 200 – 280",
-    city: "Osasco",
-    publicadoEm: "Há 3 dias",
-  },
-  {
-    id: "d-ped-1",
-    profissao: "pedreiro",
-    titulo: "Rebocar parede da sala",
-    resumo: "Aprox. 25 m², preparação para pintura.",
-    orcamentoLabel: "Material incluso — orçar",
-    city: "São Paulo — Itaquera",
-    publicadoEm: "Hoje",
-  },
-  {
-    id: "d-ped-2",
-    profissao: "pedreiro",
-    titulo: "Chapisco e contrapiso em área externa",
-    resumo: "12 m², precisa impermeabilização.",
-    orcamentoLabel: "Até R$ 1.800",
-    city: "Taboão da Serra",
-    publicadoEm: "Ontem",
-  },
-  {
-    id: "d-ped-3",
-    profissao: "pedreiro",
-    titulo: "Abrir vão para porta de correr",
-    resumo: "Alvenaria com 15 cm, com acabamento.",
-    orcamentoLabel: "R$ 900 – 1.200",
-    city: "São Bernardo — Centro",
-    publicadoEm: "Há 4 dias",
-  },
-  {
-    id: "d-enc-1",
-    profissao: "encanador",
-    titulo: "Vazamento em registro do chuveiro",
-    resumo: "Apartamento, torneira gotejando há uma semana.",
-    orcamentoLabel: "Até R$ 250",
-    city: "São Paulo — Perdizes",
-    publicadoEm: "Hoje",
-  },
-  {
-    id: "d-enc-2",
-    profissao: "encanador",
-    titulo: "Instalar torneira e sifão novos",
-    resumo: "Compras feitas pelo cliente; só instalação.",
-    orcamentoLabel: "R$ 180",
-    city: "Cotia — Granja Viana",
-    publicadoEm: "Ontem",
-  },
-  {
-    id: "d-enc-3",
-    profissao: "encanador",
-    titulo: "Desentupir ralo da lavanderia",
-    resumo: "Máquina de alta pressão se preciso.",
-    orcamentoLabel: "R$ 120 – 200",
-    city: "São Paulo — Butantã",
-    publicadoEm: "Há 2 dias",
-  },
-  {
-    id: "d-pin-1",
-    profissao: "pintor",
-    titulo: "Pintar 2 quartos + teto",
-    resumo: "Massa corrida ok; cor já escolhida (branco gelo).",
-    orcamentoLabel: "R$ 28–32/m²",
-    city: "São Paulo — Santana",
-    publicadoEm: "Hoje",
-  },
-  {
-    id: "d-pin-2",
-    profissao: "pintor",
-    titulo: "Pintura externa de muro — 40 m linear",
-    resumo: "Textura acrílica, duas demãos.",
-    orcamentoLabel: "Sob consulta",
-    city: "Mauá — Centro",
-    publicadoEm: "Ontem",
-  },
-  {
-    id: "d-pin-3",
-    profissao: "pintor",
-    titulo: "Acabamento fino sala integrada",
-    resumo: "Rodapés e cantos com fita; cliente exige acabamento premium.",
-    orcamentoLabel: "Acima de R$ 4.000",
-    city: "Diadema — Centro",
-    publicadoEm: "Há 5 dias",
-  },
-];
+  {} as Record<ProfissaoSlug, DemandaServico[]>,
+);
 
 export const MOCK_CHAT_THREADS: ChatThread[] = [
   {
