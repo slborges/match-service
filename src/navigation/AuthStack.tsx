@@ -1,5 +1,6 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import { AuthInicioScreen } from "../screens/auth/AuthInicioScreen";
 import { LoginScreen } from "../screens/auth/LoginScreen";
 import { RegisterScreen } from "../screens/auth/RegisterScreen";
 import { WelcomeScreen } from "../screens/auth/WelcomeScreen";
@@ -15,6 +16,11 @@ export function AuthStack() {
         contentStyle: { backgroundColor: "#f8fafc" },
       }}
     >
+      <Stack.Screen
+        name="Inicio"
+        component={AuthInicioScreen}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name="BoasVindas"
         component={WelcomeScreen}

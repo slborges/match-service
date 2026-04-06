@@ -1,6 +1,7 @@
 import type { ProfissaoSlug } from "../data/mock";
 
 export type AuthStackParamList = {
+  Inicio: undefined;
   BoasVindas: undefined;
   Cadastro: { perfil: "cliente" | "profissional" };
   Login: { email?: string } | undefined;

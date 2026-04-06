@@ -74,16 +74,6 @@ export function WelcomeScreen() {
             </Text>
           </View>
         </Pressable>
-
-        <Pressable
-          onPress={() => navigation.navigate("Login", {})}
-          className="mt-8 items-center py-2"
-        >
-          <Text className="text-center text-sm text-slate-500">
-            Já tem conta?{" "}
-            <Text className="font-semibold text-blue-600">Entrar</Text>
-          </Text>
-        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
