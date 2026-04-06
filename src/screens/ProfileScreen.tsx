@@ -52,7 +52,7 @@ export function ProfileScreen() {
           <Text className="mt-1 text-xs text-slate-400">{user.email}</Text>
         </View>
 
-        <View className="mt-8 rounded-[8px] bg-white p-5 shadow-sm">
+        <View className="mt-8 rounded-[8px] border border-slate-200 bg-white p-5">
           <Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
             {isCliente
               ? "Interesses / serviços procurados"
@@ -74,11 +74,20 @@ export function ProfileScreen() {
           )}
         </View>
 
+        <View className="mt-4 rounded-[8px] border border-slate-200 bg-white p-5">
+          <Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+            Reputação (mock)
+          </Text>
+          <Text className="mt-2 text-slate-700">
+            ★ 5.0 · Perfil novo — avaliações em breve
+          </Text>
+        </View>
+
         {isCliente ? (
-          <View className="mt-4 overflow-hidden rounded-[8px] bg-white shadow-sm">
+          <View className="mt-4 overflow-hidden rounded-[8px] border border-slate-200 bg-white">
             <Pressable
               onPress={() => navigation.navigate("PedidoNovo")}
-              className="flex-row items-center justify-between border-b border-slate-100 px-5 py-4 active:bg-slate-50"
+              className="flex-row items-center justify-between border-b border-slate-200 px-5 py-4 active:bg-slate-50"
             >
               <View className="flex-1 flex-row items-center gap-3 pr-2">
                 <View className="rounded-[8px] bg-blue-50 p-2">
@@ -117,15 +126,6 @@ export function ProfileScreen() {
           </View>
         ) : null}
 
-        <View className="mt-4 rounded-[8px] bg-white p-5 shadow-sm">
-          <Text className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Reputação (mock)
-          </Text>
-          <Text className="mt-2 text-slate-700">
-            ★ 5.0 · Perfil novo — avaliações em breve
-          </Text>
-        </View>
-
         <Pressable
           onPress={logout}
           className="mt-8 items-center rounded-[8px] border border-slate-200 bg-white py-4 active:bg-slate-50"
@@ -133,11 +133,6 @@ export function ProfileScreen() {
           <Text className="font-semibold text-slate-700">Sair da conta</Text>
         </Pressable>
 
-        <View className="mt-6 rounded-[8px] border border-dashed border-slate-300 bg-white/80 p-4">
-          <Text className="text-center text-sm text-slate-500">
-            Sessão mockada — ao sair voltas ao ecrã de boas-vindas.
-          </Text>
-        </View>
       </ScrollView>
     </SafeAreaView>
   );

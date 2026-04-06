@@ -115,7 +115,7 @@ export function ClientPedidosListaScreen() {
             {demandasOrdenadas.map((d) => (
               <View
                 key={d.id}
-                className="rounded-[8px] border border-slate-100 bg-white p-4 shadow-sm"
+                className="rounded-[8px] border border-slate-200 bg-white p-4"
               >
                 <View className="flex-row flex-wrap items-start justify-between gap-2">
                   <Text className="flex-1 text-base font-semibold text-slate-900">

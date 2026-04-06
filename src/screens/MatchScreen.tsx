@@ -465,6 +465,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     overflow: "hidden",
     backgroundColor: "#0f172a",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
   },
   cardImageShell: {
     flex: 1,
