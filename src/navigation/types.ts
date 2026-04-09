@@ -11,7 +11,7 @@ export type AuthStackParamList = {
 export type RootTabParamList = {
   Buscar: undefined;
   Descobrir: { profissao?: ProfissaoSlug; query?: string } | undefined;
-  Conversas: undefined;
+  Conversas: { highlightThreadId?: string } | undefined;
   Perfil: NavigatorScreenParams<ProfileStackParamList> | undefined;
 };
 

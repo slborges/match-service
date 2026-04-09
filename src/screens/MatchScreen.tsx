@@ -37,7 +37,7 @@ export function MatchScreen() {
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const route = useRoute<RouteProp<RootTabParamList, "Descobrir">>();
   const params = route.params;
-  const { user } = useAuth();
+  const { user, registrarLikeNoMatch } = useAuth();
 
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
@@ -57,10 +57,23 @@ export function MatchScreen() {
   }, [isProfissional, params?.profissao, params?.query]);
 
   const [index, setIndex] = useState(0);
+  const [leftActionTick, setLeftActionTick] = useState(0);
+  const [rightActionTick, setRightActionTick] = useState(0);
+  const [leftActionIndex, setLeftActionIndex] = useState(-1);
+  const [rightActionIndex, setRightActionIndex] = useState(-1);
+  const [matchOverlay, setMatchOverlay] = useState<{
+    visible: boolean;
+    counterpartName: string;
+    message: string;
+    counterpartImageUrl?: string;
+  }>({ visible: false, counterpartName: "", message: "" });
+  const matchDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const current = filtered[index];
 
   useEffect(() => {
     setIndex(0);
+    setLeftActionIndex(-1);
+    setRightActionIndex(-1);
   }, [params?.profissao, params?.query, isProfissional]);
 
   const screenPadH = {
@@ -78,12 +91,94 @@ export function MatchScreen() {
   }, [filtered]);
 
   const skip = useCallback(() => {
+    setLeftActionIndex(-1);
+    setRightActionIndex(-1);
     goNext();
   }, [goNext]);
 
   const like = useCallback(() => {
+    setLeftActionIndex(-1);
+    setRightActionIndex(-1);
+
+    const filtroAtual = {
+      profissaoLabel: params?.profissao ? LABEL_PROFISSAO[params.profissao] : undefined,
+      query: params?.query?.trim() || undefined,
+    };
+
+    const result = isProfissional
+      ? registrarLikeNoMatch({
+        role: "profissional",
+        demanda: current as DemandaServico,
+        filtro: filtroAtual,
+        })
+      : registrarLikeNoMatch({
+        role: "cliente",
+        professional: current as Professional,
+        filtro: filtroAtual,
+        });
+
+    if (result.isNew) {
+      const counterpartName = isProfissional
+        ? (current as DemandaServico).solicitanteLabel?.split("—")[1]?.trim() ||
+          (current as DemandaServico).solicitanteLabel?.trim() ||
+          "Cliente"
+        : (current as Professional).name;
+
+      const counterpartImageUrl = isProfissional
+        ? (current as DemandaServico).imageUrl
+        : (current as Professional).imageUrl;
+
+      const message = isProfissional
+        ? `Você foi requisitado a atender a demanda "${(current as DemandaServico).titulo}".`
+        : `Você encontrou o profissional ${(current as Professional).name} para executar a demanda "${
+            (current as Professional).demandaTituloMatch || "informada"
+          }".`;
+
+      setMatchOverlay({
+        visible: true,
+        counterpartName,
+        message,
+        counterpartImageUrl,
+      });
+
+      if (matchDelayRef.current) {
+        clearTimeout(matchDelayRef.current);
+      }
+
+      matchDelayRef.current = setTimeout(() => {
+        setMatchOverlay({ visible: false, counterpartName: "", message: "" });
+        navigation.navigate("Conversas", { highlightThreadId: result.threadId });
+      }, 5000);
+    }
+
     goNext();
-  }, [goNext]);
+  }, [
+    current,
+    goNext,
+    isProfissional,
+    navigation,
+    params?.profissao,
+    params?.query,
+    registrarLikeNoMatch,
+  ]);
+
+  useEffect(() => {
+    return () => {
+      if (matchDelayRef.current) {
+        clearTimeout(matchDelayRef.current);
+      }
+    };
+  }, []);
+
+  const triggerSkipWithAnimation = useCallback(() => {
+    setLeftActionIndex(index);
+    setLeftActionTick((n) => n + 1);
+  }, [index]);
+
+  const triggerLikeWithAnimation = useCallback(() => {
+    setRightActionIndex(index);
+    setRightActionTick((n) => n + 1);
+  }, [index]);
 
   const temFiltro = Boolean(params?.profissao || params?.query?.trim());
 
@@ -132,10 +227,8 @@ export function MatchScreen() {
         <Text className="text-center text-lg font-bold text-slate-900">
           {isProfissional ? "Oportunidades" : "ServLink"}
         </Text>
-        <Text className="text-center text-xs text-slate-500">
-          {isProfissional
-            ? "Ofertas de trabalho na tua área — deslize para decidir"
-            : "Deslize o card para decidir — veja a dica em baixo"}
+        <Text className="mt-1 text-center text-xs text-slate-500">
+          Ofertas de trabalho na tua área{"\n"}Esquerda passa, direita aceita
         </Text>
         {temFiltro ? (
           <View className="mt-2 flex-row items-center justify-center gap-2 px-1">
@@ -170,6 +263,11 @@ export function MatchScreen() {
             screenWidth={windowWidth}
             onSwipeLeft={skip}
             onSwipeRight={like}
+            cardIndex={index}
+            leftActionTick={leftActionTick}
+            leftActionIndex={leftActionIndex}
+            rightActionTick={rightActionTick}
+            rightActionIndex={rightActionIndex}
           />
         ) : (
           <SwipeableProfileCard
@@ -178,6 +276,11 @@ export function MatchScreen() {
             screenWidth={windowWidth}
             onSwipeLeft={skip}
             onSwipeRight={like}
+            cardIndex={index}
+            leftActionTick={leftActionTick}
+            leftActionIndex={leftActionIndex}
+            rightActionTick={rightActionTick}
+            rightActionIndex={rightActionIndex}
           />
         )}
       </View>
@@ -186,24 +289,157 @@ export function MatchScreen() {
         style={[screenPadH, styles.actionsRow]}
         className="shrink-0 border-t border-slate-200 bg-slate-100 px-2 pt-3"
       >
-        <Text style={styles.hintTitle}>Como decidir</Text>
-        <Text style={styles.hintLine}>
-          <Text style={styles.hintEm}>← Esquerda</Text>
-          <Text style={styles.hintBody}>
-            {isProfissional
-              ? " = passar esta oferta"
-              : " = deslike (passar para o próximo)"}
-          </Text>
-        </Text>
-        <Text style={styles.hintLine}>
-          <Text style={styles.hintEm}>→ Direita</Text>
-          <Text style={styles.hintBody}>
-            {isProfissional
-              ? " = tenho interesse neste trabalho"
-              : " = like (tenho interesse neste perfil)"}
-          </Text>
-        </Text>
+        <View className="flex-row items-center justify-center gap-6">
+          <Pressable
+            onPress={triggerSkipWithAnimation}
+            accessibilityRole="button"
+            accessibilityLabel="Cancelar e passar para o próximo"
+            className="h-14 w-14 items-center justify-center rounded-full border-2 border-rose-300 bg-rose-50 active:bg-rose-100"
+          >
+            <Ionicons name="close" size={28} color="#be123c" />
+          </Pressable>
+          <Pressable
+            onPress={triggerLikeWithAnimation}
+            accessibilityRole="button"
+            accessibilityLabel="Aceitar e ir para o próximo"
+            className="h-14 w-14 items-center justify-center rounded-full border-2 border-emerald-300 bg-emerald-50 active:bg-emerald-100"
+          >
+            <Ionicons name="checkmark" size={28} color="#15803d" />
+          </Pressable>
+        </View>
       </View>
+
+      {matchOverlay.visible ? (
+  <View style={StyleSheet.absoluteFillObject} className="z-50 bg-black/70">
+    <LinearGradient
+      colors={[
+        "rgba(15,23,42,0.2)",
+        "rgba(2,6,23,0.55)",
+        "rgba(15,23,42,0.2)",
+      ]}
+      locations={[0, 0.5, 1]}
+      style={{ flex: 1 }}
+    >
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          paddingHorizontal: 24,
+        }}
+      >
+        <View
+          style={{
+            width: "100%",
+            maxWidth: 360,
+            alignItems: "center",
+          }}
+        >
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            style={{
+              fontSize: 56,
+              lineHeight: 60,
+              fontWeight: "900",
+              fontStyle: "italic",
+              color: "#fff",
+              textAlign: "center",
+              textShadowColor: "rgba(0,0,0,0.45)",
+              textShadowOffset: { width: 0, height: 2 },
+              textShadowRadius: 8,
+            }}
+          >
+            Compatibilidade aprovada!
+          </Text>
+
+          <Text
+            style={{
+              marginTop: 12,
+              fontSize: 17,
+              lineHeight: 24,
+              textAlign: "center",
+              color: "rgba(255,255,255,0.9)",
+            }}
+          >
+            {matchOverlay.message}
+          </Text>
+
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 20,
+              marginTop: 28,
+            }}
+          >
+            <View
+              style={{
+                height: 96,
+                width: 96,
+                borderRadius: 48,
+                borderWidth: 3,
+                borderColor: "#fff",
+                backgroundColor: "#1d4ed8",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 28,
+                  fontWeight: "700",
+                  color: "#fff",
+                }}
+              >
+                {(user?.name?.charAt(0) || "V").toUpperCase()}
+              </Text>
+            </View>
+
+            <View
+              style={{
+                height: 96,
+                width: 96,
+                borderRadius: 48,
+                borderWidth: 3,
+                borderColor: "#fff",
+                overflow: "hidden",
+                backgroundColor: "#047857",
+              }}
+            >
+              {matchOverlay.counterpartImageUrl ? (
+                <ImageBackground
+                  source={{ uri: matchOverlay.counterpartImageUrl }}
+                  resizeMode="cover"
+                  style={{ flex: 1 }}
+                />
+              ) : (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 28,
+                      fontWeight: "700",
+                      color: "#fff",
+                    }}
+                  >
+                    {(matchOverlay.counterpartName.charAt(0) || "C").toUpperCase()}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
+        </View>
+      </View>
+    </LinearGradient>
+  </View>
+) : null}
     </SafeAreaView>
   );
 }
@@ -216,12 +452,22 @@ function SwipeableCardShell({
   onSwipeLeft,
   onSwipeRight,
   imageUri,
+  cardIndex,
+  leftActionTick,
+  leftActionIndex,
+  rightActionTick,
+  rightActionIndex,
   children,
 }: {
   screenWidth: number;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   imageUri: string;
+  cardIndex: number;
+  leftActionTick: number;
+  leftActionIndex: number;
+  rightActionTick: number;
+  rightActionIndex: number;
   children: ReactNode;
 }) {
   const translateX = useRef(new Animated.Value(0)).current;
@@ -312,6 +558,37 @@ function SwipeableCardShell({
     transform: [{ scale: likeScale }],
   };
 
+  useEffect(() => {
+    if (leftActionTick === 0 || leftActionIndex !== cardIndex) return;
+    const off = screenWidth * 1.25;
+    Animated.timing(translateX, {
+      toValue: -off,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) onSwipeLeft();
+    });
+  }, [leftActionTick, leftActionIndex, cardIndex, onSwipeLeft, screenWidth, translateX]);
+
+  useEffect(() => {
+    if (rightActionTick === 0 || rightActionIndex !== cardIndex) return;
+    const off = screenWidth * 1.25;
+    Animated.timing(translateX, {
+      toValue: off,
+      duration: 220,
+      useNativeDriver: true,
+    }).start(({ finished }) => {
+      if (finished) onSwipeRight();
+    });
+  }, [
+    rightActionTick,
+    rightActionIndex,
+    cardIndex,
+    onSwipeRight,
+    screenWidth,
+    translateX,
+  ]);
+
   return (
     <View style={styles.swipePanRoot} {...panResponder.panHandlers}>
       <Animated.View style={[styles.cardOuter, cardAnimatedStyle]}>
@@ -351,11 +628,21 @@ function SwipeableProfileCard({
   screenWidth,
   onSwipeLeft,
   onSwipeRight,
+  cardIndex,
+  leftActionTick,
+  leftActionIndex,
+  rightActionTick,
+  rightActionIndex,
 }: {
   professional: Professional;
   screenWidth: number;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  cardIndex: number;
+  leftActionTick: number;
+  leftActionIndex: number;
+  rightActionTick: number;
+  rightActionIndex: number;
 }) {
   return (
     <SwipeableCardShell
@@ -363,6 +650,11 @@ function SwipeableProfileCard({
       onSwipeLeft={onSwipeLeft}
       onSwipeRight={onSwipeRight}
       imageUri={professional.imageUrl}
+      cardIndex={cardIndex}
+      leftActionTick={leftActionTick}
+      leftActionIndex={leftActionIndex}
+      rightActionTick={rightActionTick}
+      rightActionIndex={rightActionIndex}
     >
       <LinearGradient
         colors={[
@@ -394,11 +686,21 @@ function SwipeableDemandaCard({
   screenWidth,
   onSwipeLeft,
   onSwipeRight,
+  cardIndex,
+  leftActionTick,
+  leftActionIndex,
+  rightActionTick,
+  rightActionIndex,
 }: {
   demanda: DemandaServico;
   screenWidth: number;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
+  cardIndex: number;
+  leftActionTick: number;
+  leftActionIndex: number;
+  rightActionTick: number;
+  rightActionIndex: number;
 }) {
   return (
     <SwipeableCardShell
@@ -406,6 +708,11 @@ function SwipeableDemandaCard({
       onSwipeLeft={onSwipeLeft}
       onSwipeRight={onSwipeRight}
       imageUri={demanda.imageUrl}
+      cardIndex={cardIndex}
+      leftActionTick={leftActionTick}
+      leftActionIndex={leftActionIndex}
+      rightActionTick={rightActionTick}
+      rightActionIndex={rightActionIndex}
     >
       <LinearGradient
         colors={[
@@ -481,6 +788,8 @@ const styles = StyleSheet.create({
   },
   actionsRow: {
     paddingBottom: 16,
+    justifyContent: "center",
+    alignItems: "center",
   },
   /** iOS não aplica bem className em LinearGradient — padding explícito */
   cardOverlay: {

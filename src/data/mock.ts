@@ -26,6 +26,8 @@ export interface Professional {
   profissao: ProfissaoSlug;
   name: string;
   service: string;
+  /** Título de demanda usado na simulação de match para cliente. */
+  demandaTituloMatch: string;
   priceLabel: string;
   rating: number;
   reviewCount: number;
@@ -55,6 +57,7 @@ type BlocoProfissao = {
   profissao: ProfissaoSlug;
   service: string;
   nomes: [string, string, string, string, string];
+  titulosDemandasMatch: [string, string, string, string, string];
   /**
    * Foto de **perfil** de cada profissional (mesma ordem que `nomes`).
    * Troque o URL à mão; no produto virá do upload do utilizador.
@@ -76,6 +79,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Felipe Nogueira",
       "André Santana",
       "Lucas Ferreira",
+    ],
+    titulosDemandasMatch: [
+      "Trocar disjuntor do quadro principal",
+      "Instalar tomadas 220V na cozinha",
+      "Revisar curto intermitente na sala",
+      "Refazer circuito da área de serviço",
+      "Substituir fiação antiga do corredor",
     ],
     fotosPerfil: [
       "https://img.freepik.com/fotos-gratis/homem-um-tecnico-eletrico-trabalhando-em-uma-central-eletrica-com-fusiveis_169016-24230.jpg?semt=ais_hybrid&w=740&q=80",
@@ -111,6 +121,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Fernanda Lima",
       "Carla Souza",
     ],
+    titulosDemandasMatch: [
+      "Faxina pós-mudança em apartamento",
+      "Limpeza semanal de 3 cômodos",
+      "Organização completa do closet",
+      "Limpeza pesada de cozinha e banheiros",
+      "Higienização de estofado e tapetes",
+    ],
     fotosPerfil: [
       "https://img.freepik.com/fotos-gratis/dona-de-casa-sorridente-em-pe-de-avental-na-cozinha_259150-59701.jpg?semt=ais_hybrid&w=740&q=80",
       "https://revistaaldeia.com.br/arquivos/images/Dani%20Diarista-18.jpg",
@@ -144,6 +161,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Sérgio Oliveira",
       "Paulo Henrique Dias",
       "Roberto Campos",
+    ],
+    titulosDemandasMatch: [
+      "Rebocar parede da sala",
+      "Assentar porcelanato no quarto",
+      "Abrir vão para porta de correr",
+      "Construir muro de divisa",
+      "Nivelar contrapiso da varanda",
     ],
     fotosPerfil: [
       "https://primeirapagina.com.br/wp-content/uploads/2024/12/casa-pedreiro-1200x1595.jpeg",
@@ -179,6 +203,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Bruno Aquino",
       "Diego Pires",
     ],
+    titulosDemandasMatch: [
+      "Consertar vazamento no chuveiro",
+      "Trocar sifão e torneira da cozinha",
+      "Desentupir ralo da lavanderia",
+      "Substituir caixa acoplada do banheiro",
+      "Instalar aquecedor a gás",
+    ],
     fotosPerfil: [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTWacBfCV46JHB-LVhSQu65UYGc0npgK1GDwQ&s",
       "https://sosreformasereparos.com.br/wp-content/uploads/2024/06/Encanador-em-Carapicuiba-e-regiao-SOS-Reformas-e-Reparos.png",
@@ -212,6 +243,13 @@ const BLOCOS: BlocoProfissao[] = [
       "Vinícius Lata",
       "Gabriel Acabamentos",
       "Henrique Moraes",
+    ],
+    titulosDemandasMatch: [
+      "Pintar dois quartos e corredor",
+      "Repintar fachada frontal da casa",
+      "Acabamento fino da sala integrada",
+      "Aplicar textura em parede externa",
+      "Pintura completa de apartamento",
     ],
     fotosPerfil: [
       "https://www.shutterstock.com/shutterstock/videos/3859678837/thumb/1.jpg?ip=x480",
@@ -249,6 +287,7 @@ function montarProfissionais(): Professional[] {
         profissao: bloco.profissao,
         name: bloco.nomes[i],
         service: bloco.service,
+        demandaTituloMatch: bloco.titulosDemandasMatch[i],
         priceLabel: bloco.priceLabels[i],
         rating: bloco.ratings[i],
         reviewCount: bloco.reviews[i],

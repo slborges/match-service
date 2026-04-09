@@ -14,6 +14,9 @@ import {
   IMAGEM_CARD_PROFISSAO,
   MOCK_DEMANDAS_ACEITAS_PROFISSIONAL,
   MOCK_PEDIDOS_CLIENTE,
+  type ChatThread,
+  type DemandaServico,
+  type Professional,
   type ProfissaoSlug,
 } from "../data/mock";
 
@@ -110,6 +113,7 @@ type AuthContextValue = {
   demandasCliente: DemandaCliente[];
   /** Demandas aceitas no chat (só relevante quando `user.role === "profissional"`). */
   demandasProfissionalAceitas: DemandaProfissionalAceita[];
+  chatThreads: ChatThread[];
   addDemandaCliente: (input: NovaDemandaClienteInput) => void;
   setDemandaClienteStatus: (
     id: string,
@@ -123,6 +127,19 @@ type AuthContextValue = {
   profissionalSolicitarConfirmacaoExecucao: (demandaProfissionalId: string) => boolean;
   cancelarDemandaCliente: (demandaClienteId: string) => boolean;
   cancelarDemandaProfissional: (demandaProfissionalId: string) => boolean;
+  registrarLikeNoMatch: (
+    payload:
+      | {
+          role: "cliente";
+          professional: Professional;
+          filtro?: { profissaoLabel?: string; query?: string };
+        }
+      | {
+          role: "profissional";
+          demanda: DemandaServico;
+          filtro?: { profissaoLabel?: string; query?: string };
+        },
+  ) => { threadId: string; isNew: boolean };
   register: (data: RegistrationDraft) => void;
   login: (email: string, password: string) => boolean;
   /** Entrada instantânea com perfil de demonstração (cliente ou profissional). */
@@ -133,6 +150,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 const STORAGE_KEY_DEMANDAS_CLIENTE = "@servlink:demandasCliente";
 const STORAGE_KEY_DEMANDAS_PRO_ACEITAS = "@servlink:demandasProfissionalAceitas";
+const STORAGE_KEY_CHAT_THREADS = "@servlink:chatThreads";
 
 function novoIdDemandaCliente(): string {
   return `dc-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
@@ -150,15 +168,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [demandasProfissionalAceitas, setDemandasProfissionalAceitas] = useState<
     DemandaProfissionalAceita[]
   >(() => MOCK_DEMANDAS_ACEITAS_PROFISSIONAL);
+  const [chatThreads, setChatThreads] = useState<ChatThread[]>([]);
   const hydratedRef = useRef(false);
 
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const [rawCliente, rawProf] = await Promise.all([
+        const [rawCliente, rawProf, rawChats] = await Promise.all([
           AsyncStorage.getItem(STORAGE_KEY_DEMANDAS_CLIENTE),
           AsyncStorage.getItem(STORAGE_KEY_DEMANDAS_PRO_ACEITAS),
+          AsyncStorage.getItem(STORAGE_KEY_CHAT_THREADS),
         ]);
         if (!mounted) return;
         if (rawCliente) {
@@ -168,6 +188,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setDemandasProfissionalAceitas(
             JSON.parse(rawProf) as DemandaProfissionalAceita[],
           );
+        }
+        if (rawChats) {
+          setChatThreads(JSON.parse(rawChats) as ChatThread[]);
         }
       } catch {
         // Em modo mock, falha de persistência não bloqueia uso da app.
@@ -195,6 +218,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       JSON.stringify(demandasProfissionalAceitas),
     ).catch(() => {});
   }, [demandasProfissionalAceitas]);
+
+  useEffect(() => {
+    if (!hydratedRef.current) return;
+    AsyncStorage.setItem(
+      STORAGE_KEY_CHAT_THREADS,
+      JSON.stringify(chatThreads),
+    ).catch(() => {});
+  }, [chatThreads]);
 
   const addDemandaCliente = useCallback(
     (input: NovaDemandaClienteInput) => {
@@ -349,6 +380,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [demandasProfissionalAceitas, demandasCliente],
   );
 
+  const registrarLikeNoMatch = useCallback(
+    (
+      payload:
+        | {
+            role: "cliente";
+            professional: Professional;
+            filtro?: { profissaoLabel?: string; query?: string };
+          }
+        | {
+            role: "profissional";
+            demanda: DemandaServico;
+            filtro?: { profissaoLabel?: string; query?: string };
+          },
+    ): { threadId: string; isNew: boolean } => {
+      const matchKey =
+        payload.role === "cliente"
+          ? `cliente:${payload.professional.id}`
+          : `profissional:${payload.demanda.id}`;
+      const threadId = `m-${matchKey}`;
+
+      const exists = chatThreads.some((t) => t.id === threadId);
+      if (exists) {
+        return { threadId, isNew: false };
+      }
+
+      const name =
+        payload.role === "cliente"
+          ? payload.professional.name
+          : (payload.demanda.solicitanteLabel?.split("—")[1]?.trim() ||
+            payload.demanda.solicitanteLabel?.trim() ||
+            "Cliente");
+
+      const filtroPartes = [
+        payload.filtro?.profissaoLabel?.trim(),
+        payload.filtro?.query?.trim(),
+      ].filter(Boolean);
+
+      const contextoFiltro =
+        filtroPartes.length > 0
+          ? ` Filtro: ${filtroPartes.join(" · ")}.`
+          : "";
+
+      const lastMessage =
+        payload.role === "cliente"
+          ? `Novo match! Converse para combinar o serviço.${contextoFiltro}`
+          : `Novo match! Converse para fechar os detalhes.${contextoFiltro}`;
+
+      const novo: ChatThread = {
+        id: threadId,
+        name,
+        lastMessage,
+        timeLabel: "Agora",
+        unread: 1,
+      };
+
+      setChatThreads((prev) => [novo, ...prev]);
+      return { threadId, isNew: true };
+    },
+    [chatThreads],
+  );
+
   const register = useCallback((data: RegistrationDraft) => {
     setPendingRegistration(data);
   }, []);
@@ -412,6 +504,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       pendingRegistration,
       demandasCliente,
       demandasProfissionalAceitas,
+      chatThreads,
       addDemandaCliente,
       setDemandaClienteStatus,
       setDemandaProfissionalAceitaStatus,
@@ -419,6 +512,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profissionalSolicitarConfirmacaoExecucao,
       cancelarDemandaCliente,
       cancelarDemandaProfissional,
+      registrarLikeNoMatch,
       register,
       login,
       loginDemo,
@@ -429,6 +523,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       pendingRegistration,
       demandasCliente,
       demandasProfissionalAceitas,
+      chatThreads,
       addDemandaCliente,
       setDemandaClienteStatus,
       setDemandaProfissionalAceitaStatus,
@@ -436,6 +531,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       profissionalSolicitarConfirmacaoExecucao,
       cancelarDemandaCliente,
       cancelarDemandaProfissional,
+      registrarLikeNoMatch,
       register,
       login,
       loginDemo,
