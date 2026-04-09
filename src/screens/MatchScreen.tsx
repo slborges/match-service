@@ -30,7 +30,7 @@ import {
   type Professional,
 } from "../data/mock";
 import { useAuth } from "../context/AuthContext";
-import type { RootTabParamList } from "../navigation/types";
+import type { PerfilCompativelParams, RootTabParamList } from "../navigation/types";
 
 export function MatchScreen() {
   const insets = useSafeAreaInsets();
@@ -63,11 +63,20 @@ export function MatchScreen() {
   const [rightActionIndex, setRightActionIndex] = useState(-1);
   const [matchOverlay, setMatchOverlay] = useState<{
     visible: boolean;
+    threadId: string;
+    threadName: string;
     counterpartName: string;
     message: string;
     counterpartImageUrl?: string;
-  }>({ visible: false, counterpartName: "", message: "" });
-  const matchDelayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    perfilCompativel: PerfilCompativelParams | null;
+  }>({
+    visible: false,
+    threadId: "",
+    threadName: "",
+    counterpartName: "",
+    message: "",
+    perfilCompativel: null,
+  });
   const current = filtered[index];
 
   useEffect(() => {
@@ -119,13 +128,11 @@ export function MatchScreen() {
 
     if (result.isNew) {
       const counterpartName = isProfissional
-        ? (current as DemandaServico).solicitanteLabel?.split("—")[1]?.trim() ||
-          (current as DemandaServico).solicitanteLabel?.trim() ||
-          "Cliente"
+        ? (current as DemandaServico).clientePerfilNome
         : (current as Professional).name;
 
       const counterpartImageUrl = isProfissional
-        ? (current as DemandaServico).imageUrl
+        ? (current as DemandaServico).clientePerfilImageUrl
         : (current as Professional).imageUrl;
 
       const message = isProfissional
@@ -134,24 +141,38 @@ export function MatchScreen() {
             (current as Professional).demandaTituloMatch || "informada"
           }".`;
 
+      const perfilCompativel: PerfilCompativelParams = isProfissional
+        ? {
+            tipo: "cliente",
+            name: (current as DemandaServico).clientePerfilNome,
+            city: (current as DemandaServico).city,
+            imageUrl: (current as DemandaServico).clientePerfilImageUrl,
+            demandaTitulo: (current as DemandaServico).titulo,
+            demandaResumo: (current as DemandaServico).resumo,
+            demandaOrcamentoLabel: (current as DemandaServico).orcamentoLabel,
+            profissaoLabel: LABEL_PROFISSAO[(current as DemandaServico).profissao],
+          }
+        : {
+            tipo: "profissional",
+            name: (current as Professional).name,
+            service: (current as Professional).service,
+            city: (current as Professional).city,
+            imageUrl: (current as Professional).imageUrl,
+            priceLabel: (current as Professional).priceLabel,
+            rating: (current as Professional).rating,
+            reviewCount: (current as Professional).reviewCount,
+            profissaoLabel: LABEL_PROFISSAO[(current as Professional).profissao],
+          };
+
       setMatchOverlay({
         visible: true,
+        threadId: result.threadId,
+        threadName: counterpartName,
         counterpartName,
         message,
         counterpartImageUrl,
+        perfilCompativel,
       });
-
-      if (matchDelayRef.current) {
-        clearTimeout(matchDelayRef.current);
-      }
-
-      matchDelayRef.current = setTimeout(() => {
-        setMatchOverlay({ visible: false, counterpartName: "", message: "" });
-        navigation.navigate("Conversas", {
-          screen: "ConversasLista",
-          params: { highlightThreadId: result.threadId },
-        });
-      }, 5000);
     }
 
     goNext();
@@ -165,12 +186,16 @@ export function MatchScreen() {
     registrarLikeNoMatch,
   ]);
 
-  useEffect(() => {
-    return () => {
-      if (matchDelayRef.current) {
-        clearTimeout(matchDelayRef.current);
-      }
-    };
+  const fecharOverlayMatch = useCallback(() => {
+    setMatchOverlay({
+      visible: false,
+      threadId: "",
+      threadName: "",
+      counterpartName: "",
+      message: "",
+      counterpartImageUrl: undefined,
+      perfilCompativel: null,
+    });
   }, []);
 
   const triggerSkipWithAnimation = useCallback(() => {
@@ -438,11 +463,72 @@ export function MatchScreen() {
               )}
             </View>
           </View>
+
+          <View style={{ marginTop: 28, width: "100%", gap: 12 }}>
+            <Pressable
+              onPress={() => {
+                if (!matchOverlay.perfilCompativel) return;
+                navigation.navigate("Perfil", {
+                  screen: "PerfilCompativel",
+                  params: matchOverlay.perfilCompativel,
+                });
+                fecharOverlayMatch();
+              }}
+              style={{
+                borderRadius: 8,
+                borderWidth: 2,
+                borderColor: "#fff",
+                paddingVertical: 14,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+                Ver perfil compatível
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                if (!matchOverlay.threadId) return;
+                navigation.navigate("Conversas", {
+                  screen: "ConversaDetalhe",
+                  params: {
+                    threadId: matchOverlay.threadId,
+                    threadName: matchOverlay.threadName,
+                  },
+                });
+                fecharOverlayMatch();
+              }}
+              style={{
+                borderRadius: 8,
+                backgroundColor: "#2563eb",
+                paddingVertical: 14,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
+                Ir para conversa
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={fecharOverlayMatch}
+              style={{ paddingVertical: 12, alignItems: "center" }}
+            >
+              <Text
+                style={{
+                  color: "rgba(255,255,255,0.88)",
+                  fontSize: 16,
+                  textDecorationLine: "underline",
+                }}
+              >
+                Voltar
+              </Text>
+            </Pressable>
+          </View>
         </View>
       </View>
     </LinearGradient>
   </View>
-) : null}
+      ) : null}
     </SafeAreaView>
   );
 }

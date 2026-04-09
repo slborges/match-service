@@ -408,9 +408,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const name =
         payload.role === "cliente"
           ? payload.professional.name
-          : (payload.demanda.solicitanteLabel?.split("—")[1]?.trim() ||
-            payload.demanda.solicitanteLabel?.trim() ||
-            "Cliente");
+          : payload.demanda.clientePerfilNome;
 
       const filtroPartes = [
         payload.filtro?.profissaoLabel?.trim(),

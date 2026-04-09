@@ -412,6 +412,46 @@ export const IMAGEM_CARD_PROFISSAO: Record<ProfissaoSlug, string> =
     {} as Record<ProfissaoSlug, string>,
   );
 
+/** Nomes fictícios quando a demanda não traz `solicitanteLabel` (simulação). */
+const NOME_CLIENTE_DEMANDA_FALLBACK: [
+  string,
+  string,
+  string,
+  string,
+  string,
+] = [
+  "Helena Prado",
+  "Ricardo Mota",
+  "Fernanda Dias",
+  "Gustavo Reis",
+  "Camila Nunes",
+];
+
+/** Fotos opcionais do cliente (não confundir com imagem da demanda). */
+const FOTO_CLIENTE_DEMANDA_MOCK: [
+  string | undefined,
+  string | undefined,
+  string | undefined,
+  string | undefined,
+  string | undefined,
+] = [
+  "https://img.freepik.com/fotos-gratis/retrato-de-uma-linda-mulher-sorridente_23-2148966595.jpg?semt=ais_hybrid&w=740&q=80",
+  undefined,
+  "https://img.freepik.com/fotos-gratis/retrato-de-homem-sorridente_23-2148966596.jpg?semt=ais_hybrid&w=740&q=80",
+  undefined,
+  undefined,
+];
+
+function parseClienteNomePublico(
+  solicitanteLabel: string | undefined,
+): string | null {
+  if (!solicitanteLabel?.trim()) return null;
+  const part = solicitanteLabel.split("—")[1]?.trim();
+  if (part) return part;
+  const cleaned = solicitanteLabel.replace(/^Cliente\s*[—\-]?\s*/i, "").trim();
+  return cleaned || null;
+}
+
 /** Prefixo curto para `id` das demandas (`d-ele-1` … `d-ele-5`), alinhado a `montarProfissionais`. */
 const PREFIX_DEMANDA: Record<ProfissaoSlug, string> = {
   eletricista: "ele",
@@ -666,6 +706,10 @@ export interface DemandaServico {
   publicadoEm: string;
   /** Nome fictício do cliente que publicou (demo). */
   solicitanteLabel?: string;
+  /** Nome público do cliente para perfil (simulação). */
+  clientePerfilNome: string;
+  /** Foto do cliente (opcional; não é a capa da demanda). */
+  clientePerfilImageUrl?: string;
   /** Imagem da oportunidade (mock: `BLOCOS_DEMANDA[].imagensOportunidade`; depois: upload). */
   imageUrl: string;
 }
@@ -677,6 +721,11 @@ function montarDemandas(): DemandaServico[] {
     for (let i = 0; i < 5; i++) {
       const n = i + 1;
       const sol = bloco.solicitantesLabels[i];
+      const parsedNome = parseClienteNomePublico(sol);
+      const clientePerfilNome =
+        parsedNome ?? NOME_CLIENTE_DEMANDA_FALLBACK[i];
+      const clientePerfilImageUrl = FOTO_CLIENTE_DEMANDA_MOCK[i];
+
       const base: DemandaServico = {
         id: `d-${prefix}-${n}`,
         profissao: bloco.profissao,
@@ -686,6 +735,8 @@ function montarDemandas(): DemandaServico[] {
         city: bloco.cidades[i],
         publicadoEm: bloco.publicadoEm[i],
         imageUrl: bloco.imagensOportunidade[i],
+        clientePerfilNome,
+        clientePerfilImageUrl,
       };
       lista.push(
         sol !== undefined && sol !== ""
@@ -714,7 +765,8 @@ export function filterDemandas(
         d.resumo.toLowerCase().includes(q) ||
         d.city.toLowerCase().includes(q) ||
         LABEL_PROFISSAO[d.profissao].toLowerCase().includes(q) ||
-        (d.solicitanteLabel?.toLowerCase().includes(q) ?? false),
+        (d.solicitanteLabel?.toLowerCase().includes(q) ?? false) ||
+        d.clientePerfilNome.toLowerCase().includes(q),
     );
   }
   return result;

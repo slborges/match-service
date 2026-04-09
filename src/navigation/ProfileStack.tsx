@@ -4,6 +4,7 @@ import { ClientPedidoNovoScreen } from "../screens/ClientPedidoNovoScreen";
 import { ClientPedidosListaScreen } from "../screens/ClientPedidosListaScreen";
 import { ConfirmActionScreen } from "../screens/ConfirmActionScreen";
 import { ProfDemandasAceitasScreen } from "../screens/ProfDemandasAceitasScreen";
+import { PerfilCompativelScreen } from "../screens/PerfilCompativelScreen";
 import { ProfileScreen } from "../screens/ProfileScreen";
 import type { ProfileStackParamList } from "./types";
 
@@ -34,6 +35,11 @@ export function ProfileStack() {
       <Stack.Screen
         name="DemandasAceitas"
         component={ProfDemandasAceitasScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="PerfilCompativel"
+        component={PerfilCompativelScreen}
         options={{ headerShown: false }}
       />
       <Stack.Screen

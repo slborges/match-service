@@ -15,6 +15,30 @@ export type RootTabParamList = {
   Perfil: NavigatorScreenParams<ProfileStackParamList> | undefined;
 };
 
+/** Perfil da contraparte mostrado após compatibilidade aprovada (simulação). */
+export type PerfilCompativelParams =
+  | {
+      tipo: "profissional";
+      name: string;
+      service: string;
+      city: string;
+      imageUrl: string;
+      priceLabel: string;
+      rating: number;
+      reviewCount: number;
+      profissaoLabel: string;
+    }
+  | {
+      tipo: "cliente";
+      name: string;
+      city: string;
+      imageUrl?: string;
+      demandaTitulo: string;
+      demandaResumo: string;
+      demandaOrcamentoLabel: string;
+      profissaoLabel: string;
+    };
+
 export type ChatStackParamList = {
   ConversasLista: { highlightThreadId?: string } | undefined;
   ConversaDetalhe: { threadId: string; threadName: string };
@@ -26,6 +50,7 @@ export type ProfileStackParamList = {
   PedidoNovo: undefined;
   PedidosLista: undefined;
   DemandasAceitas: undefined;
+  PerfilCompativel: PerfilCompativelParams;
   ConfirmarAcao: {
     tipo:
       | "prof-confirmar-execucao"
