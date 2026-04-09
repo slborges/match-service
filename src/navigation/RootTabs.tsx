@@ -70,10 +70,17 @@ export function RootTabs() {
         name="Perfil"
         component={ProfileStack}
         options={{
+          popToTopOnBlur: true,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" color={color} size={size} />
           ),
         }}
+        listeners={({ navigation }) => ({
+          tabPress: (e) => {
+            e.preventDefault();
+            navigation.navigate("Perfil", { screen: "PerfilInicio" });
+          },
+        })}
       />
     </Tab.Navigator>
   );
