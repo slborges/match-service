@@ -71,6 +71,8 @@ export type AuthUser = {
   city: string;
   /** Cliente: interesses; profissional: serviços */
   skillsOrServices: string;
+  /** Foto de perfil (mock URL; no futuro: upload). */
+  profileImageUrl?: string;
 };
 
 export type RegistrationDraft = {
@@ -91,6 +93,8 @@ export const DEMO_USER_CLIENTE: AuthUser = {
   role: "cliente",
   city: "São Paulo — Zona Sul",
   skillsOrServices: "Elétrica, Limpeza, Pequenas reformas",
+  profileImageUrl:
+    "https://img.freepik.com/fotos-gratis/retrato-de-uma-linda-mulher-sorridente_23-2148966595.jpg?semt=ais_hybrid&w=740&q=80",
 };
 
 export const DEMO_USER_PROFISSIONAL: AuthUser = {
@@ -100,6 +104,8 @@ export const DEMO_USER_PROFISSIONAL: AuthUser = {
   role: "profissional",
   city: "São Paulo — Grande SP",
   skillsOrServices: "Instalações elétricas, quadros, iluminação, revisões",
+  profileImageUrl:
+    "https://img.freepik.com/fotos-gratis/retrato-de-homem-sorridente_23-2148966596.jpg?semt=ais_hybrid&w=740&q=80",
 };
 
 /** Senha partilhada pelas contas demo (login manual no ecrã Entrar). */
@@ -114,6 +120,8 @@ type AuthContextValue = {
   /** Demandas aceitas no chat (só relevante quando `user.role === "profissional"`). */
   demandasProfissionalAceitas: DemandaProfissionalAceita[];
   chatThreads: ChatThread[];
+  /** Zera não lidas e remove realce de linha na lista ao abrir o detalhe. */
+  marcarConversaLida: (threadId: string) => void;
   addDemandaCliente: (input: NovaDemandaClienteInput) => void;
   setDemandaClienteStatus: (
     id: string,
@@ -439,6 +447,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [chatThreads],
   );
 
+  const marcarConversaLida = useCallback((threadId: string) => {
+    setChatThreads((prev) =>
+      prev.map((t) => (t.id === threadId ? { ...t, unread: 0 } : t)),
+    );
+  }, []);
+
   const register = useCallback((data: RegistrationDraft) => {
     setPendingRegistration(data);
   }, []);
@@ -503,6 +517,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       demandasCliente,
       demandasProfissionalAceitas,
       chatThreads,
+      marcarConversaLida,
       addDemandaCliente,
       setDemandaClienteStatus,
       setDemandaProfissionalAceitaStatus,
@@ -522,6 +537,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       demandasCliente,
       demandasProfissionalAceitas,
       chatThreads,
+      marcarConversaLida,
       addDemandaCliente,
       setDemandaClienteStatus,
       setDemandaProfissionalAceitaStatus,

@@ -1,10 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../context/AuthContext";
+import { iniciaisNomeSobrenome } from "../utils/iniciaisNomeSobrenome";
 import type { ProfileStackParamList } from "../navigation/types";
 
 function parseSkills(raw: string): string[] {
@@ -40,10 +41,21 @@ export function ProfileScreen() {
         contentContainerStyle={[padH, styles.scrollContent]}
       >
         <View className="items-center pt-6">
-          <View className="h-24 w-24 items-center justify-center rounded-full bg-blue-600">
-            <Text className="text-3xl font-bold text-white">
-              {user.name.charAt(0).toUpperCase()}
-            </Text>
+          <View className="h-24 w-24 overflow-hidden rounded-full bg-blue-600">
+            {user.profileImageUrl ? (
+              <Image
+                source={{ uri: user.profileImageUrl }}
+                style={{ width: "100%", height: "100%" }}
+                resizeMode="cover"
+                accessibilityLabel={`Foto de perfil de ${user.name}`}
+              />
+            ) : (
+              <View className="h-full w-full items-center justify-center">
+                <Text className="text-3xl font-bold text-white">
+                  {iniciaisNomeSobrenome(user.name)}
+                </Text>
+              </View>
+            )}
           </View>
           <Text className="mt-4 text-2xl font-bold text-slate-900">{user.name}</Text>
           <Text className="mt-1 text-slate-500">

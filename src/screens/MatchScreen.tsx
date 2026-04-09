@@ -31,6 +31,7 @@ import {
 } from "../data/mock";
 import { useAuth } from "../context/AuthContext";
 import type { PerfilCompativelParams, RootTabParamList } from "../navigation/types";
+import { iniciaisNomeSobrenome } from "../utils/iniciaisNomeSobrenome";
 
 export function MatchScreen() {
   const insets = useSafeAreaInsets();
@@ -409,20 +410,36 @@ export function MatchScreen() {
                 borderRadius: 48,
                 borderWidth: 3,
                 borderColor: "#fff",
+                overflow: "hidden",
                 backgroundColor: "#1d4ed8",
-                justifyContent: "center",
-                alignItems: "center",
               }}
             >
-              <Text
-                style={{
-                  fontSize: 28,
-                  fontWeight: "700",
-                  color: "#fff",
-                }}
-              >
-                {(user?.name?.charAt(0) || "V").toUpperCase()}
-              </Text>
+              {user?.profileImageUrl ? (
+                <ImageBackground
+                  source={{ uri: user.profileImageUrl }}
+                  resizeMode="cover"
+                  style={{ flex: 1 }}
+                  accessibilityLabel={`Foto de ${user?.name ?? "utilizador"}`}
+                />
+              ) : (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 28,
+                      fontWeight: "700",
+                      color: "#fff",
+                    }}
+                  >
+                    {iniciaisNomeSobrenome(user?.name ?? "", "V")}
+                  </Text>
+                </View>
+              )}
             </View>
 
             <View
@@ -457,7 +474,7 @@ export function MatchScreen() {
                       color: "#fff",
                     }}
                   >
-                    {(matchOverlay.counterpartName.charAt(0) || "C").toUpperCase()}
+                    {iniciaisNomeSobrenome(matchOverlay.counterpartName, "C")}
                   </Text>
                 </View>
               )}

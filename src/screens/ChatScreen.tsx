@@ -5,6 +5,7 @@ import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../context/AuthContext";
+import { iniciaisNomeSobrenome } from "../utils/iniciaisNomeSobrenome";
 import type { ChatStackParamList } from "../navigation/types";
 import type { RouteProp } from "@react-navigation/native";
 
@@ -61,8 +62,8 @@ export function ChatScreen() {
             }
           >
             <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-blue-100">
-              <Text className="text-lg font-semibold text-blue-700">
-                {item.name.charAt(0)}
+              <Text className="text-base font-semibold text-blue-700">
+                {iniciaisNomeSobrenome(item.name)}
               </Text>
             </View>
             <View className="flex-1">

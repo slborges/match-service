@@ -5,6 +5,7 @@ import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScreenHeaderBar } from "../components/ScreenHeaderBar";
+import { iniciaisNomeSobrenome } from "../utils/iniciaisNomeSobrenome";
 import type { ProfileStackParamList } from "../navigation/types";
 
 export function PerfilCompativelScreen() {
@@ -38,12 +39,11 @@ export function PerfilCompativelScreen() {
         accessibilityLabel={`Avatar de ${p.name}`}
       >
         <Text style={styles.avatarInitial}>
-          {(p.name.charAt(0) || "C").toUpperCase()}
+          {iniciaisNomeSobrenome(p.name, "C")}
         </Text>
       </View>
     );
 
-  const headline = p.tipo === "profissional" ? p.name : p.name;
   const subline =
     p.tipo === "profissional"
       ? `Profissional · ${p.city}`
@@ -62,7 +62,7 @@ export function PerfilCompativelScreen() {
             className="mt-4 text-center text-2xl font-bold text-slate-900"
             numberOfLines={p.tipo === "profissional" ? 2 : 2}
           >
-            {headline}
+            {p.name}
           </Text>
           <Text className="mt-1 text-slate-500">{subline}</Text>
           <Text className="mt-1 text-xs text-slate-400">
