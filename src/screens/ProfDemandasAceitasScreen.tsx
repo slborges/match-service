@@ -146,7 +146,7 @@ export function ProfDemandasAceitasScreen() {
                   </Text>
                   <Text className="mt-1 text-sm text-slate-600">📍 {d.city}</Text>
                   {d.statusExecucao === "nao_executada" ? (
-                    <View className="mt-3 flex-row flex-wrap gap-2">
+                    <View className="mt-3 gap-2">
                       <Pressable
                         onPress={() =>
                           navigation.navigate("ConfirmarAcao", {
@@ -158,7 +158,7 @@ export function ProfDemandasAceitasScreen() {
                             confirmarLabel: "Cancelar",
                           })
                         }
-                        className="self-start rounded-[8px] border border-rose-200 bg-rose-50 px-3 py-2 active:bg-rose-100"
+                        className="items-center rounded-[8px] border border-rose-200 bg-rose-50 px-3 py-2 active:bg-rose-100"
                       >
                         <Text className="text-sm font-medium text-rose-800">
                           Cancelar
@@ -175,9 +175,9 @@ export function ProfDemandasAceitasScreen() {
                             confirmarLabel: "Confirmar execução",
                           })
                         }
-                        className="self-start rounded-[8px] border border-slate-200 bg-slate-50 px-3 py-2 active:bg-slate-100"
+                        className="items-center rounded-[8px] border border-blue-200 bg-blue-50 px-3 py-2 active:bg-blue-100"
                       >
-                        <Text className="text-sm font-medium text-slate-700">
+                        <Text className="text-sm font-medium text-blue-800">
                           Confirmar execução
                         </Text>
                       </Pressable>

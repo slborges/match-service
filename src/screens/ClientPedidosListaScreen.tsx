@@ -179,40 +179,42 @@ export function ClientPedidosListaScreen() {
                         Você já pode confirmar a execução desta demanda.
                       </Text>
                     )}
-                    <Pressable
-                      onPress={() =>
-                        navigation.navigate("ConfirmarAcao", {
-                          tipo: "cli-cancelar-demanda",
-                          demandaClienteId: d.id,
-                          titulo: "Cancelar demanda",
-                          mensagem:
-                            "Esta demanda será cancelada para cliente e profissional. A ação não poderá ser revertida.",
-                          confirmarLabel: "Cancelar",
-                        })
-                      }
-                      className="mt-2 self-start rounded-[8px] border border-rose-200 bg-rose-50 px-3 py-2 active:bg-rose-100"
-                    >
-                      <Text className="text-sm font-medium text-rose-800">
-                        Cancelar
-                      </Text>
-                    </Pressable>
-                    <Pressable
-                      onPress={() =>
-                        navigation.navigate("ConfirmarAcao", {
-                          tipo: "cli-confirmar-execucao",
-                          demandaClienteId: d.id,
-                          titulo: "Confirmar execução",
-                          mensagem:
-                            "Ao confirmar execução, a demanda será concluída para você e para o profissional. Esta ação não poderá ser desfeita.",
-                          confirmarLabel: "Confirmar execução",
-                        })
-                      }
-                      className="mt-2 self-start rounded-[8px] border border-blue-200 bg-blue-50 px-3 py-2 active:bg-blue-100"
-                    >
-                      <Text className="text-sm font-medium text-blue-800">
-                        Confirmar execução
-                      </Text>
-                    </Pressable>
+                    <View className="mt-2 gap-2">
+                      <Pressable
+                        onPress={() =>
+                          navigation.navigate("ConfirmarAcao", {
+                            tipo: "cli-cancelar-demanda",
+                            demandaClienteId: d.id,
+                            titulo: "Cancelar demanda",
+                            mensagem:
+                              "Esta demanda será cancelada para cliente e profissional. A ação não poderá ser revertida.",
+                            confirmarLabel: "Cancelar",
+                          })
+                        }
+                        className="items-center rounded-[8px] border border-rose-200 bg-rose-50 px-3 py-2 active:bg-rose-100"
+                      >
+                        <Text className="text-sm font-medium text-rose-800">
+                          Cancelar
+                        </Text>
+                      </Pressable>
+                      <Pressable
+                        onPress={() =>
+                          navigation.navigate("ConfirmarAcao", {
+                            tipo: "cli-confirmar-execucao",
+                            demandaClienteId: d.id,
+                            titulo: "Confirmar execução",
+                            mensagem:
+                              "Ao confirmar execução, a demanda será concluída para você e para o profissional. Esta ação não poderá ser desfeita.",
+                            confirmarLabel: "Confirmar execução",
+                          })
+                        }
+                        className="items-center rounded-[8px] border border-blue-200 bg-blue-50 px-3 py-2 active:bg-blue-100"
+                      >
+                        <Text className="text-sm font-medium text-blue-800">
+                          Confirmar execução
+                        </Text>
+                      </Pressable>
+                    </View>
                   </>
                 ) : listaSoExemplosMock ? (
                   <Text className="mt-3 text-xs text-slate-400">
