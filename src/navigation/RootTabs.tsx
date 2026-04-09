@@ -3,7 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../context/AuthContext";
-import { ChatScreen, MatchScreen, SearchScreen } from "../screens";
+import { MatchScreen, SearchScreen } from "../screens";
+import { ChatStack } from "./ChatStack";
 import { ProfileStack } from "./ProfileStack";
 import type { RootTabParamList } from "./types";
 
@@ -59,7 +60,7 @@ export function RootTabs() {
       />
       <Tab.Screen
         name="Conversas"
-        component={ChatScreen}
+        component={ChatStack}
         options={{
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="chatbubbles" color={color} size={size} />

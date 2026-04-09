@@ -147,7 +147,10 @@ export function MatchScreen() {
 
       matchDelayRef.current = setTimeout(() => {
         setMatchOverlay({ visible: false, counterpartName: "", message: "" });
-        navigation.navigate("Conversas", { highlightThreadId: result.threadId });
+        navigation.navigate("Conversas", {
+          screen: "ConversasLista",
+          params: { highlightThreadId: result.threadId },
+        });
       }, 5000);
     }
 

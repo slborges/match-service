@@ -1,14 +1,17 @@
-import { useRoute } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useAuth } from "../context/AuthContext";
-import type { RootTabParamList } from "../navigation/types";
+import type { ChatStackParamList } from "../navigation/types";
 import type { RouteProp } from "@react-navigation/native";
 
 export function ChatScreen() {
   const insets = useSafeAreaInsets();
-  const route = useRoute<RouteProp<RootTabParamList, "Conversas">>();
+  const navigation = useNavigation<NativeStackNavigationProp<ChatStackParamList>>();
+  const route = useRoute<RouteProp<ChatStackParamList, "ConversasLista">>();
   const { chatThreads } = useAuth();
   const highlightThreadId = route.params?.highlightThreadId;
   const padH = {
@@ -28,6 +31,19 @@ export function ChatScreen() {
         data={chatThreads}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={[padH, styles.emptyWrap]}>
+            <View className="mb-4 h-20 w-20 items-center justify-center rounded-full bg-slate-100">
+              <Ionicons name="chatbubbles-outline" size={40} color="#94a3b8" />
+            </View>
+            <Text className="text-center text-base font-semibold text-slate-700">
+              Nenhuma conversa por enquanto
+            </Text>
+            <Text className="mt-1 text-center text-sm text-slate-500">
+              Quando houver compatibilidade aprovada, as conversas aparecerão aqui.
+            </Text>
+          </View>
+        }
         renderItem={({ item }) => (
           <Pressable
             style={[
@@ -37,6 +53,12 @@ export function ChatScreen() {
               item.unread > 0 ? styles.unreadRow : null,
             ]}
             className="flex-row items-center border-b border-slate-50 active:bg-slate-50"
+            onPress={() =>
+              navigation.navigate("ConversaDetalhe", {
+                threadId: item.id,
+                threadName: item.name,
+              })
+            }
           >
             <View className="mr-3 h-12 w-12 items-center justify-center rounded-full bg-blue-100">
               <Text className="text-lg font-semibold text-blue-700">
@@ -73,6 +95,13 @@ const styles = StyleSheet.create({
   },
   listContent: {
     paddingBottom: 32,
+    flexGrow: 1,
+  },
+  emptyWrap: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingBottom: 80,
   },
   row: {
     paddingBottom: 16,

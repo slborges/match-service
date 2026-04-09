@@ -11,8 +11,13 @@ export type AuthStackParamList = {
 export type RootTabParamList = {
   Buscar: undefined;
   Descobrir: { profissao?: ProfissaoSlug; query?: string } | undefined;
-  Conversas: { highlightThreadId?: string } | undefined;
+  Conversas: NavigatorScreenParams<ChatStackParamList> | undefined;
   Perfil: NavigatorScreenParams<ProfileStackParamList> | undefined;
+};
+
+export type ChatStackParamList = {
+  ConversasLista: { highlightThreadId?: string } | undefined;
+  ConversaDetalhe: { threadId: string; threadName: string };
 };
 
 /** Pilha dentro do separador Perfil — perfil, publicação e lista de pedidos (cliente). */
