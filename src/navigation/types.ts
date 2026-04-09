@@ -1,4 +1,5 @@
 import type { ProfissaoSlug } from "../data/mock";
+import type { NavigatorScreenParams } from "@react-navigation/native";
 
 export type AuthStackParamList = {
   Inicio: undefined;
@@ -11,7 +12,7 @@ export type RootTabParamList = {
   Buscar: undefined;
   Descobrir: { profissao?: ProfissaoSlug; query?: string } | undefined;
   Conversas: undefined;
-  Perfil: undefined;
+  Perfil: NavigatorScreenParams<ProfileStackParamList> | undefined;
 };
 
 /** Pilha dentro do separador Perfil — perfil, publicação e lista de pedidos (cliente). */

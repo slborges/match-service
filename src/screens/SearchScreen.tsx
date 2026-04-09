@@ -95,7 +95,9 @@ export function SearchScreen() {
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["top"]}>
       <View style={padH} className="border-b border-slate-100 bg-white pb-3 pt-2">
-        <Text className="text-xl font-bold text-slate-900">Buscar</Text>
+        <Text className="text-xl font-bold text-slate-900">
+          {isCliente ? "Pedidos" : "Demandas"}
+        </Text>
         <Text className="mt-0.5 text-sm text-slate-500">
           {isCliente
             ? "Escolha uma categoria ou pesquise e abra o Descobrir para ver os cards."
@@ -207,11 +209,46 @@ export function SearchScreen() {
           }}
         />
 
-        <Text className="mt-5 text-center text-sm leading-5 text-slate-500">
+        <Text className="mt-1 text-center text-sm leading-5 text-slate-500">
           {isCliente
             ? "Deslize para o lado para ver todas as categorias. Toque num card para abrir o Descobrir com esse filtro."
             : "Deslize para ver todas as áreas. Toque num card para abrir o Descobrir com ofertas de trabalho nessa área."}
         </Text>
+
+        {isCliente ? (
+          <View className="mt-4 gap-2">
+            <Pressable
+              onPress={() => navigation.navigate("Perfil", { screen: "PedidoNovo" })}
+              className="flex-row items-center justify-center rounded-[8px] bg-blue-600 py-3 active:bg-blue-700"
+            >
+              <Ionicons name="add-circle-outline" size={20} color="#fff" />
+              <Text className="ml-2 text-base font-semibold text-white">
+                Novo pedido
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={() => navigation.navigate("Perfil", { screen: "PedidosLista" })}
+              className="flex-row items-center justify-center rounded-[8px] border border-slate-200 bg-white py-3 active:bg-slate-50"
+            >
+              <Ionicons name="list-outline" size={20} color="#334155" />
+              <Text className="ml-2 text-base font-semibold text-slate-700">
+                Pedidos criados
+              </Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View className="mt-4 gap-2">
+            <Pressable
+              onPress={() => navigation.navigate("Perfil", { screen: "DemandasAceitas" })}
+              className="flex-row items-center justify-center rounded-[8px] bg-blue-600 py-3 active:bg-blue-700"
+            >
+              <Ionicons name="checkmark-done-outline" size={20} color="#fff" />
+              <Text className="ml-2 text-base font-semibold text-white">
+                Demandas aceitas
+              </Text>
+            </Pressable>
+          </View>
+        )}
       </View>
     </SafeAreaView>
   );

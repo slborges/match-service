@@ -2,6 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useAuth } from "../context/AuthContext";
 import { ChatScreen, MatchScreen, SearchScreen } from "../screens";
 import { ProfileStack } from "./ProfileStack";
 import type { RootTabParamList } from "./types";
@@ -13,6 +14,7 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
 const accent = "#2563eb";
 
 export function RootTabs() {
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
   const tabBarBottom = Math.max(insets.bottom, 10);
 
@@ -36,8 +38,13 @@ export function RootTabs() {
         name="Buscar"
         component={SearchScreen}
         options={{
+          tabBarLabel: user?.role === "cliente" ? "Pedidos" : "Demandas",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="search" color={color} size={size} />
+            <Ionicons
+              name={user?.role === "cliente" ? "document-text-outline" : "briefcase-outline"}
+              color={color}
+              size={size}
+            />
           ),
         }}
       />
