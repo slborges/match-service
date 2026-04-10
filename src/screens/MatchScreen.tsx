@@ -369,11 +369,9 @@ export function MatchScreen() {
           }}
         >
           <Text
-            numberOfLines={1}
-            adjustsFontSizeToFit
             style={{
-              fontSize: 56,
-              lineHeight: 60,
+              fontSize: 30,
+              lineHeight: 36,
               fontWeight: "900",
               fontStyle: "italic",
               color: "#fff",
