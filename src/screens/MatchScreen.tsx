@@ -152,6 +152,8 @@ export function MatchScreen() {
             demandaResumo: (current as DemandaServico).resumo,
             demandaOrcamentoLabel: (current as DemandaServico).orcamentoLabel,
             profissaoLabel: LABEL_PROFISSAO[(current as DemandaServico).profissao],
+            chatThreadId: result.threadId,
+            chatThreadName: counterpartName,
           }
         : {
             tipo: "profissional",
@@ -163,6 +165,8 @@ export function MatchScreen() {
             rating: (current as Professional).rating,
             reviewCount: (current as Professional).reviewCount,
             profissaoLabel: LABEL_PROFISSAO[(current as Professional).profissao],
+            chatThreadId: result.threadId,
+            chatThreadName: counterpartName,
           };
 
       setMatchOverlay({

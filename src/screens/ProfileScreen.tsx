@@ -148,7 +148,7 @@ export function ProfileScreen() {
                 </View>
                 <View className="flex-1">
                   <Text className="text-base font-semibold text-slate-900">
-                    Demandas aceitas
+                    Demandas compatíveis
                   </Text>
                   <Text className="mt-0.5 text-sm text-slate-500">
                     Acertadas no chat

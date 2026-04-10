@@ -244,7 +244,7 @@ export function SearchScreen() {
             >
               <Ionicons name="checkmark-done-outline" size={20} color="#fff" />
               <Text className="ml-2 text-base font-semibold text-white">
-                Demandas aceitas
+                Demandas compatíveis
               </Text>
             </Pressable>
           </View>

@@ -50,7 +50,7 @@ export function ProfDemandasAceitasScreen() {
     return (
       <View className="flex-1 bg-slate-50">
         <ScreenHeaderBar
-          title="Demandas aceitas"
+          title="Demandas compatíveis"
           onBack={() => navigation.goBack()}
         />
         <SafeAreaView className="flex-1" edges={["bottom"]}>
@@ -74,7 +74,7 @@ export function ProfDemandasAceitasScreen() {
   return (
     <View className="flex-1 bg-slate-50">
       <ScreenHeaderBar
-        title="Demandas aceitas"
+        title="Demandas compatíveis"
         onBack={() => navigation.goBack()}
       />
       <SafeAreaView className="flex-1" edges={["bottom"]}>

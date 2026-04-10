@@ -1,7 +1,7 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RouteProp } from "@react-navigation/native";
-import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ScreenHeaderBar } from "../components/ScreenHeaderBar";
@@ -48,6 +48,19 @@ export function PerfilCompativelScreen() {
     p.tipo === "profissional"
       ? `Profissional · ${p.city}`
       : `Cliente · ${p.city}`;
+  const abrirConversaPrivada = () => {
+    if (!p.chatThreadId || !p.chatThreadName) {
+      navigation.navigate("Conversas", { screen: "ConversasLista" });
+      return;
+    }
+    navigation.navigate("Conversas", {
+      screen: "ConversaDetalhe",
+      params: {
+        threadId: p.chatThreadId,
+        threadName: p.chatThreadName,
+      },
+    });
+  };
 
   return (
     <SafeAreaView className="flex-1 bg-slate-50" edges={["bottom"]}>
@@ -96,6 +109,12 @@ export function PerfilCompativelScreen() {
                 ★ {p.rating.toFixed(1)} · {p.reviewCount} avaliações
               </Text>
             </View>
+            <Pressable
+              onPress={abrirConversaPrivada}
+              className="mt-4 items-center rounded-[8px] bg-blue-600 py-4 active:bg-blue-700"
+            >
+              <Text className="text-base font-semibold text-white">Conversar</Text>
+            </Pressable>
           </>
         ) : (
           <>
@@ -130,6 +149,12 @@ export function PerfilCompativelScreen() {
               </Text>
               <Text className="mt-2 text-slate-700">{p.demandaOrcamentoLabel}</Text>
             </View>
+            <Pressable
+              onPress={abrirConversaPrivada}
+              className="mt-4 items-center rounded-[8px] bg-blue-600 py-4 active:bg-blue-700"
+            >
+              <Text className="text-base font-semibold text-white">Conversar</Text>
+            </Pressable>
           </>
         )}
       </ScrollView>

@@ -27,6 +27,8 @@ export type PerfilCompativelParams =
       rating: number;
       reviewCount: number;
       profissaoLabel: string;
+      chatThreadId?: string;
+      chatThreadName?: string;
     }
   | {
       tipo: "cliente";
@@ -37,6 +39,8 @@ export type PerfilCompativelParams =
       demandaResumo: string;
       demandaOrcamentoLabel: string;
       profissaoLabel: string;
+      chatThreadId?: string;
+      chatThreadName?: string;
     };
 
 export type ChatStackParamList = {
